@@ -18,57 +18,90 @@
       padding: 0;
     }
 
+    :root {
+      --page-x: 42px;
+      --page-top: 28px;
+      --page-bottom: 34px;
+      --header-space: 128px;
+      --hand-font: "Playwrite GB S Guides", cursive;
+      --serif-font: "Cormorant Garamond", serif;
+      --sans-font: "Inter", sans-serif;
+    }
+
     html {
       width: 100%;
       min-height: 100%;
-      background: #ffffff;
+      background: #ffffff url('./white_wall.jpg') center center / cover fixed no-repeat;
     }
 
     body {
       width: 100%;
       height: 100vh;
+      min-height: 100vh;
       overflow: hidden;
-      background: #ffffff url('white_wall.jpg') center center / cover fixed no-repeat;
+      background: #ffffff url('./white_wall.jpg') center center / cover fixed no-repeat;
       color: #111111;
-      font-family: "Inter", sans-serif;
+      font-family: var(--sans-font);
     }
 
     .page {
-      height: 100vh;
-      display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      padding: 28px 42px 34px;
-      overflow: hidden;
+      min-height: 100vh;
       background: transparent;
+      transition: opacity 360ms ease, filter 360ms ease, transform 360ms ease;
+    }
+
+    body.lightbox-open .page {
+      opacity: 0;
+      filter: blur(2px);
+      transform: scale(0.995);
+      pointer-events: none;
     }
 
     header {
+      position: fixed;
+      top: var(--page-top);
+      left: var(--page-x);
+      right: var(--page-x);
+      z-index: 20;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 24px;
-      position: relative;
-      z-index: 2;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+
+    header a {
+      pointer-events: auto;
     }
 
     .title {
-      font-family: "Cormorant Garamond", serif;
-      font-size: clamp(42px, 7vw, 96px);
-      font-weight: 300;
-      letter-spacing: -0.045em;
-      line-height: 0.92;
-      color: inherit;
+      font-family: var(--hand-font);
+      font-size: clamp(40px, 6.2vw, 82px);
+      font-weight: 400;
+      letter-spacing: -0.105em;
+      line-height: 0.98;
+      color: rgba(30, 20, 14, 0.68);
       text-decoration: none;
       cursor: pointer;
+      text-shadow:
+        0.3px 0.3px 0 rgba(255, 255, 255, 0.56),
+        0 0 0.7px rgba(32, 20, 12, 0.16);
     }
 
     nav {
       display: flex;
       gap: 22px;
       padding-top: 12px;
-      font-size: 13px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      font-family: var(--hand-font);
+      font-size: clamp(11px, 0.86vw, 14px);
+      line-height: 1;
+      letter-spacing: -0.065em;
+      text-transform: none;
+      color: rgba(30, 20, 14, 0.68);
+      text-shadow:
+        0.25px 0.25px 0 rgba(255, 255, 255, 0.56),
+        0 0 0.6px rgba(32, 20, 12, 0.14);
     }
 
     nav a {
@@ -81,7 +114,7 @@
       content: "";
       position: absolute;
       left: 0;
-      bottom: -4px;
+      bottom: -5px;
       width: 0;
       height: 1px;
       background: currentColor;
@@ -95,6 +128,7 @@
 
     main {
       position: relative;
+      height: 100vh;
       min-height: 0;
       overflow: hidden;
       background: transparent;
@@ -114,6 +148,7 @@
     #home {
       align-items: center;
       justify-content: center;
+      padding: var(--header-space) var(--page-x) var(--page-bottom);
     }
 
     .frontpage-work {
@@ -128,7 +163,7 @@
       aspect-ratio: 24 / 29.9;
       overflow: hidden;
       background: #f4f4f4;
-      box-shadow: 16px 18px 34px rgba(0, 0, 0, 0.12), 4px 5px 9px rgba(0, 0, 0, 0.08);
+      box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
     }
 
     .image-wrap img,
@@ -142,13 +177,12 @@
 
     .frontpage-caption,
     .work-caption {
-      font-family: "Playwrite GB S Guides", cursive;
+      font-family: var(--hand-font);
       font-style: normal;
       font-weight: 400;
       line-height: 1.05;
       letter-spacing: -0.085em;
       text-align: center;
-
       color: rgba(30, 20, 14, 0.62);
       background:
         radial-gradient(circle at 12% 26%, rgba(58, 38, 24, 0.26) 0 1px, transparent 1.8px),
@@ -161,14 +195,10 @@
           rgba(18, 13, 10, 0.68) 72%,
           rgba(60, 38, 24, 0.52) 100%
         );
-      background-size:
-        13px 11px,
-        17px 15px,
-        100% 100%;
+      background-size: 13px 11px, 17px 15px, 100% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-
       text-shadow:
         0.35px 0.35px 0 rgba(255, 255, 255, 0.58),
         -0.35px -0.35px 0 rgba(0, 0, 0, 0.12),
@@ -186,22 +216,35 @@
     #work {
       align-items: flex-start;
       justify-content: center;
-      padding-top: 28px;
-      padding-bottom: 28px;
       overflow-x: hidden;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       scroll-behavior: smooth;
+      padding: 0 var(--page-x) 0;
+    }
+
+    #work::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #work::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #work::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.14);
+      border-radius: 999px;
     }
 
     .work-grid {
       width: min(100%, 1480px);
+      min-height: 100%;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       align-items: flex-end;
       gap: 38px 42px;
-      padding: 0 16px 56px;
+      padding: calc(var(--header-space) + 18px) 16px 70px;
       overflow: visible;
     }
 
@@ -219,14 +262,14 @@
       aspect-ratio: var(--ratio);
       overflow: hidden;
       background: #f4f4f4;
-      box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.14), 4px 5px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: 12px 14px 28px rgba(0, 0, 0, 0.13), 3px 4px 9px rgba(0, 0, 0, 0.075);
       cursor: zoom-in;
       transition: transform 220ms ease, box-shadow 220ms ease;
     }
 
     .work-item:hover {
       transform: translateY(-2px);
-      box-shadow: 18px 20px 38px rgba(0, 0, 0, 0.15), 5px 6px 10px rgba(0, 0, 0, 0.08);
+      box-shadow: 16px 18px 34px rgba(0, 0, 0, 0.14), 4px 5px 10px rgba(0, 0, 0, 0.075);
     }
 
     .work-item:focus-visible {
@@ -276,76 +319,56 @@
       margin-top: 3px;
     }
 
-    .size-frontpage {
-      --w: 24;
-      --ratio: 24 / 29.9;
-    }
-
-    .size-24-square {
-      --w: 24;
-      --ratio: 1 / 1;
-    }
-
-    .size-12-tall {
-      --w: 12;
-      --ratio: 12 / 16.6;
-    }
-
-    .size-12-square {
-      --w: 12;
-      --ratio: 1 / 1;
-    }
-
-    .size-lying-often {
-      --w: 18;
-      --ratio: 1 / 1;
-    }
-
-    .size-dialogue {
-      --w: 39.8;
-      --ratio: 39.8 / 29.9;
-    }
+    .size-frontpage { --w: 24; --ratio: 24 / 29.9; }
+    .size-24-square { --w: 24; --ratio: 1 / 1; }
+    .size-12-tall { --w: 12; --ratio: 12 / 16.6; }
+    .size-12-square { --w: 12; --ratio: 1 / 1; }
+    .size-lying-often { --w: 18; --ratio: 1 / 1; }
+    .size-dialogue { --w: 39.8; --ratio: 39.8 / 29.9; }
 
     .simple-page {
       align-items: center;
       justify-content: center;
-      font-family: "Cormorant Garamond", serif;
+      padding: var(--header-space) var(--page-x) var(--page-bottom);
+      font-family: var(--hand-font);
       font-size: clamp(24px, 3vw, 42px);
-      font-weight: 300;
-      letter-spacing: -0.02em;
+      font-weight: 400;
+      letter-spacing: -0.085em;
+      color: rgba(30, 20, 14, 0.68);
+      mix-blend-mode: multiply;
     }
 
     .lightbox {
       position: fixed;
       inset: 0;
-      z-index: 50;
+      z-index: 60;
       display: grid;
       place-items: center;
       padding: 32px;
-      background: #ffffff url('white_wall_big.jpg') center center / cover fixed no-repeat;
+      background: transparent;
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
-      transition: opacity 280ms ease, visibility 0s linear 280ms;
+      transition: opacity 320ms ease, visibility 0s linear 320ms;
     }
 
     .lightbox.is-open {
       opacity: 1;
       visibility: visible;
       pointer-events: auto;
-      transition: opacity 280ms ease, visibility 0s;
+      transition: opacity 320ms ease, visibility 0s;
     }
 
     .lightbox__image {
-      max-width: min(82vw, 1120px);
-      max-height: 82vh;
+      max-width: min(84vw, 1120px);
+      max-height: 84vh;
       object-fit: contain;
       display: block;
       cursor: zoom-out;
       box-shadow: 18px 22px 46px rgba(0, 0, 0, 0.16), 5px 7px 14px rgba(0, 0, 0, 0.08);
-      transform: scale(0.965) translateY(10px);
+      transform: scale(0.955) translateY(12px);
       opacity: 0;
-      transition: transform 320ms ease, opacity 260ms ease;
+      transition: transform 360ms cubic-bezier(.2,.8,.2,1), opacity 300ms ease;
     }
 
     .lightbox.is-open .lightbox__image {
@@ -359,14 +382,18 @@
       right: 28px;
       border: 0;
       background: transparent;
-      color: #111111;
-      font: inherit;
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      color: rgba(30, 20, 14, 0.68);
+      font-family: var(--hand-font);
+      font-size: 13px;
+      letter-spacing: -0.065em;
       cursor: pointer;
-      opacity: 0.72;
-      transition: opacity 180ms ease;
+      opacity: 0;
+      transition: opacity 220ms ease;
+      mix-blend-mode: multiply;
+    }
+
+    .lightbox.is-open .lightbox__close {
+      opacity: 0.78;
     }
 
     .lightbox__close:hover {
@@ -378,6 +405,11 @@
     }
 
     @media (max-width: 900px) {
+      :root {
+        --page-x: 30px;
+        --header-space: 118px;
+      }
+
       .work-entry {
         --scale: 10.8px;
       }
@@ -388,23 +420,35 @@
     }
 
     @media (max-width: 720px) {
+      :root {
+        --page-x: 22px;
+        --page-top: 22px;
+        --page-bottom: max(30px, env(safe-area-inset-bottom));
+        --header-space: 142px;
+      }
+
+      html,
+      body {
+        background: #ffffff url('./white_wall.jpg') center top / cover scroll no-repeat;
+      }
+
       body {
         min-height: 100svh;
         height: auto;
         overflow: auto;
-        background: #ffffff url('white_wall.jpg') center top / cover scroll no-repeat;
       }
 
       .page {
         min-height: 100svh;
-        height: auto;
-        padding: 22px 22px max(30px, env(safe-area-inset-bottom));
-        overflow: visible;
       }
 
       header {
         flex-direction: column;
         gap: 16px;
+      }
+
+      .title {
+        font-size: clamp(38px, 12vw, 58px);
       }
 
       nav {
@@ -414,23 +458,25 @@
       }
 
       main {
-        min-height: calc(100svh - 136px);
+        height: auto;
+        min-height: 100svh;
         overflow: visible;
       }
 
       .view {
-        min-height: calc(100svh - 136px);
+        min-height: 100svh;
         height: auto;
       }
 
       #home {
-        padding-top: 24px;
-        padding-bottom: 30px;
+        min-height: 100svh;
+        padding-top: var(--header-space);
+        padding-bottom: 36px;
       }
 
       .image-wrap {
         width: min(78vw, 405px);
-        max-height: 66svh;
+        max-height: 62svh;
         min-width: 0;
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.11), 0 3px 8px rgba(0, 0, 0, 0.07);
       }
@@ -441,20 +487,20 @@
       }
 
       .frontpage-caption,
-      .work-caption {
-        color: rgba(40, 27, 18, 0.68);
+      .work-caption,
+      .title,
+      nav,
+      .simple-page {
         background: none;
         -webkit-background-clip: initial;
         background-clip: initial;
         -webkit-text-fill-color: currentColor;
         text-shadow: 0.25px 0.25px 0 rgba(255, 255, 255, 0.52), 0 0 0.45px rgba(32, 20, 12, 0.12);
-        mix-blend-mode: multiply;
       }
 
       #work {
-        align-items: flex-start;
-        padding-top: 28px;
-        padding-bottom: 0;
+        min-height: 100svh;
+        padding: 0 var(--page-x);
         overflow: visible;
       }
 
@@ -463,7 +509,7 @@
         flex-wrap: nowrap;
         align-items: center;
         gap: 44px;
-        padding: 0 0 70px;
+        padding: calc(var(--header-space) + 18px) 0 70px;
         overflow: visible;
       }
 
@@ -486,12 +532,12 @@
       }
 
       .simple-page {
-        min-height: calc(100svh - 136px);
+        min-height: 100svh;
+        padding-top: var(--header-space);
       }
 
       .lightbox {
         padding: 24px;
-        background: #ffffff url('white_wall_big.jpg') center top / cover scroll no-repeat;
       }
 
       .lightbox__image {
@@ -507,13 +553,9 @@
     }
 
     @media (max-width: 420px) {
-      .page {
-        padding-left: 18px;
-        padding-right: 18px;
-      }
-
-      .title {
-        font-size: clamp(40px, 13vw, 58px);
+      :root {
+        --page-x: 18px;
+        --header-space: 136px;
       }
 
       nav {
@@ -523,7 +565,7 @@
 
       .image-wrap {
         width: min(84vw, 340px);
-        max-height: 60svh;
+        max-height: 58svh;
       }
 
       .work-entry {
@@ -689,7 +731,7 @@
           return;
         }
 
-        img.src = `${base}.${imageExtensions[index]}`;
+        img.src = `./${base}.${imageExtensions[index]}`;
         index += 1;
       }
 
