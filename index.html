@@ -21,7 +21,7 @@
     body {
       height: 100vh;
       overflow: hidden;
-      background: #ffffff url('white_wall.jpg') center / cover fixed no-repeat;
+      background: #ffffff url('./white_wall.jpg') center / cover fixed no-repeat;
       color: #111111;
       font-family: "Inter", sans-serif;
     }
@@ -360,7 +360,7 @@
       <section id="home" class="view active" aria-label="Home">
         <div class="frontpage-work">
           <div class="image-wrap">
-            <img src="Frontpage_img.jpg" alt="Mouth Open Wide For Nothing Important" />
+            <img data-img-base="Frontpage_img" alt="Mouth Open Wide For Nothing Important" />
           </div>
           <p class="frontpage-caption">MOUTH OPEN WIDE FOR NOTHING IMPORTANT, 2025</p>
         </div>
@@ -378,7 +378,7 @@
         <div class="work-grid">
           <div class="work-entry size-frontpage">
             <div class="work-item">
-              <img src="Frontpage_img.jpg" alt="Mouth Open Wide For Nothing Important" />
+              <img data-img-base="Frontpage_img" alt="Mouth Open Wide For Nothing Important" />
             </div>
             <p class="work-caption">
               <span class="work-title">MOUTH OPEN WIDE FOR NOTHING IMPORTANT, 2025</span>
@@ -388,7 +388,7 @@
 
           <div class="work-entry size-24-square">
             <div class="work-item">
-              <img src="Portfolio1.jpg" alt="One Time Only" />
+              <img data-img-base="Portfolio1" alt="One Time Only" />
             </div>
             <p class="work-caption">
               <span class="work-title">ONE TIME ONLY, 2025</span>
@@ -398,7 +398,7 @@
 
           <div class="work-entry size-12-tall">
             <div class="work-item tall-crop">
-              <img src="Portfolio2.jpg" alt="Untitled" />
+              <img data-img-base="Portfolio2" alt="Untitled" />
             </div>
             <p class="work-caption">
               <span class="work-title">UNTITLED</span>
@@ -408,7 +408,7 @@
 
           <div class="work-entry size-12-tall">
             <div class="work-item tall-crop">
-              <img src="Portfolio3.jpg" alt="Untitled" />
+              <img data-img-base="Portfolio3" alt="Untitled" />
             </div>
             <p class="work-caption">
               <span class="work-title">UNTITLED</span>
@@ -418,7 +418,7 @@
 
           <div class="work-entry size-dialogue">
             <div class="work-item">
-              <img src="Portfolio4.jpg" alt="Dialogue 1" />
+              <img data-img-base="Portfolio4" alt="Dialogue 1" />
             </div>
             <p class="work-caption dialogue-caption">
               <span class="work-title">&nbsp;</span>
@@ -429,7 +429,7 @@
 
           <div class="work-entry size-12-square">
             <div class="work-item">
-              <img src="Portfolio5.jpg" alt="Untitled" />
+              <img data-img-base="Portfolio5" alt="Untitled" />
             </div>
             <p class="work-caption">
               <span class="work-title">UNTITLED</span>
@@ -439,7 +439,7 @@
 
           <div class="work-entry size-lying-often">
             <div class="work-item png-clean">
-              <img src="Portfolio6.png" alt="Lying Often" />
+              <img data-img-base="Portfolio6" alt="Lying Often" />
             </div>
             <p class="work-caption">
               <span class="work-title">LYING OFTEN, 2025</span>
@@ -479,6 +479,26 @@
       if (document.getElementById(startingView)) {
         showView(startingView);
       }
+    });
+
+    const imageExtensions = ['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'];
+
+    document.querySelectorAll('img[data-img-base]').forEach((img) => {
+      const base = img.dataset.imgBase;
+      let index = 0;
+
+      function tryNextImage() {
+        if (index >= imageExtensions.length) {
+          console.warn(`Could not load image for: ${base}`);
+          return;
+        }
+
+        img.src = `./${base}.${imageExtensions[index]}`;
+        index += 1;
+      }
+
+      img.addEventListener('error', tryNextImage);
+      tryNextImage();
     });
   </script>
 </body>
