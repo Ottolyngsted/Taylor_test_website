@@ -149,6 +149,7 @@
       align-items: center;
       justify-content: center;
       padding: var(--header-space) var(--page-x) var(--page-bottom);
+      cursor: pointer;
     }
 
     .frontpage-work {
@@ -722,13 +723,16 @@
 
     const imageExtensions = ['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'];
 
-    document.querySelectorAll('img[data-img-base]').forEach((img) => {
-      const base = img.dataset.imgBase;
+    function loadImageBase(img, base) {
+      if (!img || !base) return;
+
+      img.dataset.imgBase = base;
       let index = 0;
 
       function tryNextImage() {
         if (index >= imageExtensions.length) {
           console.warn(`Could not load image for: ${base}`);
+          img.removeEventListener('error', tryNextImage);
           return;
         }
 
@@ -736,9 +740,82 @@
         index += 1;
       }
 
+      img.removeEventListener('error', img._tryNextImage || (() => {}));
+      img._tryNextImage = tryNextImage;
       img.addEventListener('error', tryNextImage);
       tryNextImage();
+    }
+
+    document.querySelectorAll('img[data-img-base]').forEach((img) => {
+      loadImageBase(img, img.dataset.imgBase);
     });
+
+    const frontpageWorks = [
+      {
+        imageBase: 'Frontpage_img',
+        title: 'MOUTH OPEN WIDE FOR NOTHING IMPORTANT, 2025'
+      },
+      {
+        imageBase: 'Portfolio1',
+        title: 'ONE TIME ONLY, 2025'
+      },
+      {
+        imageBase: 'Portfolio2',
+        title: 'UNTITLED'
+      },
+      {
+        imageBase: 'Portfolio3',
+        title: 'UNTITLED'
+      },
+      {
+        imageBase: 'Portfolio4',
+        title: 'DIALOGUE 1, 2025'
+      },
+      {
+        imageBase: 'Portfolio5',
+        title: 'UNTITLED'
+      },
+      {
+        imageBase: 'Portfolio6',
+        title: 'LYING OFTEN, 2025'
+      }
+    ];
+
+    const homeView = document.querySelector('#home');
+    const frontpageImage = document.querySelector('#home img[data-img-base]');
+    const frontpageCaption = document.querySelector('.frontpage-caption');
+    let currentFrontpageIndex = 0;
+    let frontpageTimer;
+
+    function showFrontpageWork(index) {
+      const work = frontpageWorks[index];
+      if (!work) return;
+
+      currentFrontpageIndex = index;
+      loadImageBase(frontpageImage, work.imageBase);
+      frontpageImage.alt = work.title;
+      frontpageCaption.textContent = work.title;
+    }
+
+    function nextFrontpageWork() {
+      showFrontpageWork((currentFrontpageIndex + 1) % frontpageWorks.length);
+    }
+
+    function restartFrontpageTimer() {
+      clearInterval(frontpageTimer);
+      frontpageTimer = setInterval(nextFrontpageWork, 3500);
+    }
+
+    if (homeView && frontpageImage && frontpageCaption) {
+      showFrontpageWork(0);
+      restartFrontpageTimer();
+
+      homeView.addEventListener('click', (event) => {
+        if (event.target.closest('a')) return;
+        nextFrontpageWork();
+        restartFrontpageTimer();
+      });
+    }
 
     const lightbox = document.querySelector('.lightbox');
     const lightboxImage = document.querySelector('.lightbox__image');
