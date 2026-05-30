@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taylor Tourek</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playwrite+GB+S+Guides:ital@0;1&display=swap" rel="stylesheet">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      background: #ffffff url('white_wall.jpg') center / cover fixed no-repeat;
+      color: #111111;
+      font-family: "Inter", sans-serif;
+    }
+
+    .page {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      padding: 28px 42px 34px;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(42px, 7vw, 96px);
+      font-weight: 300;
+      letter-spacing: -0.045em;
+      line-height: 0.92;
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    nav {
+      display: flex;
+      gap: 22px;
+      padding-top: 12px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    nav a {
+      color: inherit;
+      text-decoration: none;
+      position: relative;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 0;
+      height: 1px;
+      background: currentColor;
+      transition: width 180ms ease;
+    }
+
+    nav a:hover::after,
+    nav a.active::after {
+      width: 100%;
+    }
+
+    main {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .view {
+      height: 100%;
+      display: none;
+      overflow: hidden;
+    }
+
+    .view.active {
+      display: flex;
+    }
+
+    #home {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .frontpage-work {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .image-wrap {
+      width: min(40.5vw, 446px);
+      max-height: 72vh;
+      aspect-ratio: 24 / 29.9;
+      overflow: hidden;
+      background: #f4f4f4;
+      box-shadow: 16px 18px 34px rgba(0, 0, 0, 0.12), 4px 5px 9px rgba(0, 0, 0, 0.08);
+    }
+
+    .image-wrap img,
+    .work-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: none;
+    }
+
+    .frontpage-caption,
+    .work-caption {
+      font-family: "Playwrite GB S Guides", cursive;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.085em;
+      text-align: center;
+
+      color: rgba(30, 20, 14, 0.62);
+      background:
+        radial-gradient(circle at 12% 26%, rgba(58, 38, 24, 0.26) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 58% 62%, rgba(22, 16, 12, 0.18) 0 0.8px, transparent 1.6px),
+        linear-gradient(
+          115deg,
+          rgba(42, 25, 14, 0.76) 0%,
+          rgba(23, 18, 14, 0.58) 28%,
+          rgba(72, 48, 30, 0.46) 48%,
+          rgba(18, 13, 10, 0.68) 72%,
+          rgba(60, 38, 24, 0.52) 100%
+        );
+      background-size:
+        13px 11px,
+        17px 15px,
+        100% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+      text-shadow:
+        0.35px 0.35px 0 rgba(255, 255, 255, 0.58),
+        -0.35px -0.35px 0 rgba(0, 0, 0, 0.12),
+        0 0 0.7px rgba(32, 20, 12, 0.14);
+      mix-blend-mode: multiply;
+    }
+
+    .frontpage-caption {
+      margin-top: 12px;
+      font-size: clamp(16.5px, 1.58vw, 25.5px);
+      max-width: min(46vw, 560px);
+      transform: rotate(-0.4deg);
+    }
+
+    #work {
+      align-items: center;
+      justify-content: center;
+      padding-top: 10px;
+      overflow: hidden;
+    }
+
+    .work-grid {
+      width: min(100%, 1480px);
+      max-height: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 38px 42px;
+      padding: 0 16px 20px;
+      overflow: hidden;
+    }
+
+    .work-entry {
+      --scale: 13.2px;
+      width: calc(var(--w) * var(--scale));
+      max-width: 92vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .work-item {
+      width: 100%;
+      aspect-ratio: var(--ratio);
+      overflow: hidden;
+      background: #f4f4f4;
+      box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.14), 4px 5px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .work-item.png-clean {
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    .work-item.png-clean img {
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      filter: contrast(1.06);
+    }
+
+    .work-item.tall-crop img {
+      object-position: center 58%;
+    }
+
+    .work-caption {
+      margin-top: 8px;
+      font-size: clamp(9px, 0.56vw, 12px);
+      max-width: 100%;
+      transform: rotate(-0.2deg);
+    }
+
+    .dialogue-caption {
+      margin-top: 0;
+    }
+
+    .work-title {
+      display: block;
+      text-transform: uppercase;
+    }
+
+    .work-details {
+      display: block;
+      margin-top: 3px;
+    }
+
+    .size-frontpage {
+      --w: 24;
+      --ratio: 24 / 29.9;
+    }
+
+    .size-24-square {
+      --w: 24;
+      --ratio: 1 / 1;
+    }
+
+    .size-12-tall {
+      --w: 12;
+      --ratio: 12 / 16.6;
+    }
+
+    .size-12-square {
+      --w: 12;
+      --ratio: 1 / 1;
+    }
+
+    .size-lying-often {
+      --w: 18;
+      --ratio: 1 / 1;
+    }
+
+    .size-dialogue {
+      --w: 39.8;
+      --ratio: 39.8 / 29.9;
+    }
+
+    .simple-page {
+      align-items: center;
+      justify-content: center;
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(24px, 3vw, 42px);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+    }
+
+    @media (max-width: 900px) {
+      .work-entry {
+        --scale: 10.8px;
+      }
+
+      .work-grid {
+        gap: 34px 32px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding: 24px;
+      }
+
+      header {
+        flex-direction: column;
+      }
+
+      nav {
+        padding-top: 0;
+        gap: 18px;
+      }
+
+      .image-wrap {
+        width: min(78vw, 405px);
+        max-height: 68vh;
+        min-width: 0;
+      }
+
+      .frontpage-caption {
+        font-size: clamp(15px, 4.8vw, 22.5px);
+        max-width: min(82vw, 420px);
+      }
+
+      #work {
+        align-items: flex-start;
+        padding-top: 28px;
+        overflow-y: auto;
+      }
+
+      .work-grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 44px;
+        padding-bottom: 70px;
+        overflow: visible;
+      }
+
+      .work-entry {
+        --scale: 8.4px;
+      }
+
+      .work-caption {
+        font-size: clamp(10px, 3.1vw, 12.5px);
+        max-width: min(78vw, 340px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a class="title" href="#home" data-view="home">Taylor Tourek</a>
+      <nav aria-label="Main navigation">
+        <a href="#contact" data-view="contact">Contact</a>
+        <a href="#cv" data-view="cv">CV</a>
+        <a href="#work" data-view="work">Work</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="home" class="view active" aria-label="Home">
+        <div class="frontpage-work">
+          <div class="image-wrap">
+            <img src="Frontpage_img.jpg" alt="Mouth Open Wide For Nothing Important" />
+          </div>
+          <p class="frontpage-caption">MOUTH OPEN WIDE FOR NOTHING IMPORTANT, 2025</p>
+        </div>
+      </section>
+
+      <section id="contact" class="view simple-page" aria-label="Contact">
+        <p>Contact</p>
+      </section>
+
+      <section id="cv" class="view simple-page" aria-label="CV">
+        <p>CV</p>
+      </section>
+
+      <section id="work" class="view" aria-label="Work">
+        <div class="work-grid">
+          <div class="work-entry size-frontpage">
+            <div class="work-item">
+              <img src="Frontpage_img.jpg" alt="Mouth Open Wide For Nothing Important" />
+            </div>
+            <p class="work-caption">
+              <span class="work-title">MOUTH OPEN WIDE FOR NOTHING IMPORTANT, 2025</span>
+              <span class="work-details">29 9/10 × 24 × 4/5 in | 76 × 61 × 2 cm</span>
+            </p>
+          </div>
+
+          <div class="work-entry size-24-square">
+            <div class="work-item">
+              <img src="Portfolio1.jpg" alt="One Time Only" />
+            </div>
+            <p class="work-caption">
+              <span class="work-title">ONE TIME ONLY, 2025</span>
+              <span class="work-details">24 × 24 × 1 3/5 in | 61 × 61 × 4 cm</span>
+            </p>
+          </div>
+
+          <div class="work-entry size-12-tall">
+            <div class="work-item tall-crop">
+              <img src="Portfolio2.jpg" alt="Untitled" />
+            </div>
+            <p class="work-caption">
+              <span class="work-title">UNTITLED</span>
+              <span class="work-details">12 × 12 × 4/5 in | 30.5 × 30.5 × 2 cm</span>
+            </p>
+          </div>
+
+          <div class="work-entry size-12-tall">
+            <div class="work-item tall-crop">
+              <img src="Portfolio3.jpg" alt="Untitled" />
+            </div>
+            <p class="work-caption">
+              <span class="work-title">UNTITLED</span>
+              <span class="work-details">12 × 12 × 4/5 in | 30.5 × 30.5 × 2 cm</span>
+            </p>
+          </div>
+
+          <div class="work-entry size-dialogue">
+            <div class="work-item">
+              <img src="Portfolio4.jpg" alt="Dialogue 1" />
+            </div>
+            <p class="work-caption dialogue-caption">
+              <span class="work-title">&nbsp;</span>
+              <span class="work-title">DIALOGUE 1, 2025</span>
+              <span class="work-details">39 4/5 × 29 9/10 × 1 1/5 in | 101 × 76 × 3 cm</span>
+            </p>
+          </div>
+
+          <div class="work-entry size-12-square">
+            <div class="work-item">
+              <img src="Portfolio5.jpg" alt="Untitled" />
+            </div>
+            <p class="work-caption">
+              <span class="work-title">UNTITLED</span>
+              <span class="work-details">12 × 12 × 4/5 in | 30.5 × 30.5 × 2 cm</span>
+            </p>
+          </div>
+
+          <div class="work-entry size-lying-often">
+            <div class="work-item png-clean">
+              <img src="Portfolio6.png" alt="Lying Often" />
+            </div>
+            <p class="work-caption">
+              <span class="work-title">LYING OFTEN, 2025</span>
+              <span class="work-details">12 × 12 × 4/5 in | 30.5 × 30.5 × 2 cm</span>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const links = document.querySelectorAll('[data-view]');
+    const views = document.querySelectorAll('.view');
+
+    function showView(viewName) {
+      views.forEach((view) => {
+        view.classList.toggle('active', view.id === viewName);
+      });
+
+      links.forEach((link) => {
+        link.classList.toggle('active', link.dataset.view === viewName);
+      });
+
+      history.replaceState(null, '', '#' + viewName);
+    }
+
+    links.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        showView(link.dataset.view);
+      });
+    });
+
+    window.addEventListener('load', () => {
+      const startingView = window.location.hash.replace('#', '') || 'home';
+      if (document.getElementById(startingView)) {
+        showView(startingView);
+      }
+    });
+  </script>
+</body>
+</html>
