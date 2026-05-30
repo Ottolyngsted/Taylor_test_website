@@ -19,36 +19,27 @@
     }
 
     html {
+      width: 100%;
       min-height: 100%;
       background: #ffffff;
     }
 
     body {
-      min-height: 100vh;
-      min-height: 100svh;
+      width: 100%;
+      height: 100vh;
       overflow: hidden;
-      background: #ffffff;
+      background: #ffffff url('white_wall.jpg') center center / cover fixed no-repeat;
       color: #111111;
       font-family: "Inter", sans-serif;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background: #ffffff url('./white_wall.jpg') center / cover no-repeat;
-      transform: translateZ(0);
-    }
-
     .page {
       height: 100vh;
-      height: 100svh;
       display: grid;
       grid-template-rows: auto minmax(0, 1fr);
       padding: 28px 42px 34px;
       overflow: hidden;
+      background: transparent;
     }
 
     header {
@@ -106,12 +97,14 @@
       position: relative;
       min-height: 0;
       overflow: hidden;
+      background: transparent;
     }
 
     .view {
       height: 100%;
       display: none;
       overflow: hidden;
+      background: transparent;
     }
 
     .view.active {
@@ -135,9 +128,7 @@
       aspect-ratio: 24 / 29.9;
       overflow: hidden;
       background: #f4f4f4;
-      box-shadow:
-        0 18px 38px rgba(0, 0, 0, 0.12),
-        0 4px 12px rgba(0, 0, 0, 0.07);
+      box-shadow: 16px 18px 34px rgba(0, 0, 0, 0.12), 4px 5px 9px rgba(0, 0, 0, 0.08);
     }
 
     .image-wrap img,
@@ -193,22 +184,25 @@
     }
 
     #work {
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding-top: 10px;
-      overflow: hidden;
+      padding-top: 28px;
+      padding-bottom: 28px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
 
     .work-grid {
       width: min(100%, 1480px);
-      max-height: 100%;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       align-items: flex-end;
       gap: 38px 42px;
-      padding: 0 16px 20px;
-      overflow: hidden;
+      padding: 0 16px 56px;
+      overflow: visible;
     }
 
     .work-entry {
@@ -225,15 +219,30 @@
       aspect-ratio: var(--ratio);
       overflow: hidden;
       background: #f4f4f4;
-      box-shadow:
-        0 16px 34px rgba(0, 0, 0, 0.13),
-        0 4px 10px rgba(0, 0, 0, 0.075);
+      box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.14), 4px 5px 8px rgba(0, 0, 0, 0.08);
+      cursor: zoom-in;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+    }
+
+    .work-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 18px 20px 38px rgba(0, 0, 0, 0.15), 5px 6px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .work-item:focus-visible {
+      outline: 1px solid rgba(0, 0, 0, 0.45);
+      outline-offset: 5px;
     }
 
     .work-item.png-clean {
       background: transparent;
       box-shadow: none;
       overflow: visible;
+    }
+
+    .work-item.png-clean:hover {
+      transform: none;
+      box-shadow: none;
     }
 
     .work-item.png-clean img {
@@ -306,112 +315,66 @@
       letter-spacing: -0.02em;
     }
 
-
-
-    body.work-zoom-open {
-      overflow: hidden;
-    }
-
-    body.work-zoom-open::before {
-      background-image: url('./white_wall_big.jpg');
-      background-position: center;
-      background-size: cover;
-    }
-
-    .work-item {
-      cursor: zoom-in;
-      transition: transform 220ms ease, box-shadow 220ms ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .work-item:hover {
-      transform: translateY(-2px);
-      box-shadow:
-        0 19px 38px rgba(0, 0, 0, 0.14),
-        0 5px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .work-item.png-clean:hover {
-      box-shadow: none;
-    }
-
-    .work-lightbox {
+    .lightbox {
       position: fixed;
       inset: 0;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: clamp(22px, 5vw, 58px);
-      background: rgba(255, 255, 255, 0.06);
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      background: #ffffff url('white_wall_big.jpg') center center / cover fixed no-repeat;
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
-      transition: opacity 260ms ease, visibility 0s linear 260ms;
-      cursor: zoom-out;
+      transition: opacity 280ms ease, visibility 0s linear 280ms;
     }
 
-    .work-lightbox.is-open {
+    .lightbox.is-open {
       opacity: 1;
       visibility: visible;
       pointer-events: auto;
-      transition: opacity 260ms ease, visibility 0s;
+      transition: opacity 280ms ease, visibility 0s;
     }
 
-    .work-lightbox__inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      max-width: min(92vw, 1120px);
-      max-height: min(88svh, 860px);
-      transform: scale(0.965) translateY(8px);
+    .lightbox__image {
+      max-width: min(82vw, 1120px);
+      max-height: 82vh;
+      object-fit: contain;
+      display: block;
+      cursor: zoom-out;
+      box-shadow: 18px 22px 46px rgba(0, 0, 0, 0.16), 5px 7px 14px rgba(0, 0, 0, 0.08);
+      transform: scale(0.965) translateY(10px);
       opacity: 0;
-      transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 260ms ease;
+      transition: transform 320ms ease, opacity 260ms ease;
     }
 
-    .work-lightbox.is-open .work-lightbox__inner {
+    .lightbox.is-open .lightbox__image {
       transform: scale(1) translateY(0);
       opacity: 1;
     }
 
-    .work-lightbox__image {
-      display: block;
-      width: auto;
-      height: auto;
-      max-width: min(92vw, 1120px);
-      max-height: min(82svh, 800px);
-      object-fit: contain;
-      background: #f4f4f4;
-      box-shadow:
-        0 26px 58px rgba(0, 0, 0, 0.14),
-        0 6px 16px rgba(0, 0, 0, 0.08);
-    }
-
-    .work-lightbox__caption {
-      max-width: min(82vw, 640px);
-      font-family: "Playwrite GB S Guides", cursive;
-      font-size: clamp(10px, 1.2vw, 13px);
-      line-height: 1.08;
-      letter-spacing: -0.075em;
-      text-align: center;
-      color: rgba(42, 28, 18, 0.68);
-      text-shadow: 0.25px 0.25px 0 rgba(255, 255, 255, 0.42);
-      mix-blend-mode: multiply;
-    }
-
-    .work-lightbox__close {
-      position: absolute;
-      top: max(18px, env(safe-area-inset-top));
-      right: max(18px, env(safe-area-inset-right));
+    .lightbox__close {
+      position: fixed;
+      top: 24px;
+      right: 28px;
       border: 0;
       background: transparent;
-      color: rgba(17, 17, 17, 0.72);
+      color: #111111;
       font: inherit;
       font-size: 12px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       cursor: pointer;
+      opacity: 0.72;
+      transition: opacity 180ms ease;
+    }
+
+    .lightbox__close:hover {
+      opacity: 1;
+    }
+
+    body.lightbox-open {
+      overflow: hidden;
     }
 
     @media (max-width: 900px) {
@@ -426,146 +389,149 @@
 
     @media (max-width: 720px) {
       body {
+        min-height: 100svh;
+        height: auto;
         overflow: auto;
-        -webkit-text-size-adjust: 100%;
-      }
-
-      body::before {
-        background-position: center top;
-        background-size: auto 100%;
+        background: #ffffff url('white_wall.jpg') center top / cover scroll no-repeat;
       }
 
       .page {
-        min-height: 100vh;
         min-height: 100svh;
         height: auto;
-        padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(26px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+        padding: 22px 22px max(30px, env(safe-area-inset-bottom));
         overflow: visible;
       }
 
       header {
         flex-direction: column;
-        gap: 15px;
+        gap: 16px;
+      }
+
+      nav {
+        padding-top: 0;
+        gap: 18px;
+        font-size: 12px;
+      }
+
+      main {
+        min-height: calc(100svh - 136px);
+        overflow: visible;
+      }
+
+      .view {
+        min-height: calc(100svh - 136px);
+        height: auto;
+      }
+
+      #home {
+        padding-top: 24px;
+        padding-bottom: 30px;
+      }
+
+      .image-wrap {
+        width: min(78vw, 405px);
+        max-height: 66svh;
+        min-width: 0;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.11), 0 3px 8px rgba(0, 0, 0, 0.07);
+      }
+
+      .frontpage-caption {
+        font-size: clamp(15px, 4.8vw, 22.5px);
+        max-width: min(82vw, 420px);
+      }
+
+      .frontpage-caption,
+      .work-caption {
+        color: rgba(40, 27, 18, 0.68);
+        background: none;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+        -webkit-text-fill-color: currentColor;
+        text-shadow: 0.25px 0.25px 0 rgba(255, 255, 255, 0.52), 0 0 0.45px rgba(32, 20, 12, 0.12);
+        mix-blend-mode: multiply;
+      }
+
+      #work {
+        align-items: flex-start;
+        padding-top: 28px;
+        padding-bottom: 0;
+        overflow: visible;
+      }
+
+      .work-grid {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 44px;
+        padding: 0 0 70px;
+        overflow: visible;
+      }
+
+      .work-entry {
+        --scale: 8.4px;
+      }
+
+      .work-item {
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.07);
+      }
+
+      .work-item:hover {
+        transform: none;
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.07);
+      }
+
+      .work-caption {
+        font-size: clamp(10px, 3.1vw, 12.5px);
+        max-width: min(78vw, 340px);
+      }
+
+      .simple-page {
+        min-height: calc(100svh - 136px);
+      }
+
+      .lightbox {
+        padding: 24px;
+        background: #ffffff url('white_wall_big.jpg') center top / cover scroll no-repeat;
+      }
+
+      .lightbox__image {
+        max-width: 88vw;
+        max-height: 76svh;
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.14), 0 4px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      .lightbox__close {
+        top: max(18px, env(safe-area-inset-top));
+        right: 22px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .page {
+        padding-left: 18px;
+        padding-right: 18px;
       }
 
       .title {
-        font-size: clamp(43px, 15vw, 66px);
+        font-size: clamp(40px, 13vw, 58px);
       }
 
       nav {
         width: 100%;
         justify-content: space-between;
-        padding-top: 0;
-        gap: 14px;
-        font-size: 12px;
-      }
-
-      main {
-        overflow: visible;
-      }
-
-      .view {
-        min-height: calc(100svh - 128px);
-        height: auto;
-        overflow: visible;
-      }
-
-      #home {
-        align-items: center;
-        padding: 22px 0 18px;
       }
 
       .image-wrap {
-        width: min(82vw, 390px);
-        max-height: min(62svh, 500px);
-        min-width: 0;
-        box-shadow:
-          0 13px 24px rgba(0, 0, 0, 0.105),
-          0 2px 7px rgba(0, 0, 0, 0.06);
-      }
-
-      .frontpage-caption,
-      .work-caption {
-        color: rgba(42, 28, 18, 0.68);
-        background: none;
-        -webkit-background-clip: initial;
-        background-clip: initial;
-        -webkit-text-fill-color: currentColor;
-        text-shadow:
-          0.25px 0.25px 0 rgba(255, 255, 255, 0.42),
-          0 0.4px 0.8px rgba(38, 24, 14, 0.16);
-        mix-blend-mode: multiply;
-      }
-
-      .frontpage-caption {
-        margin-top: 10px;
-        font-size: clamp(15px, 4.6vw, 21px);
-        max-width: min(84vw, 420px);
-      }
-
-      #work {
-        align-items: flex-start;
-        justify-content: flex-start;
-        padding-top: 30px;
-        overflow: visible;
-      }
-
-      .work-grid {
-        width: 100%;
-        max-height: none;
-        flex-direction: column;
-        align-items: center;
-        gap: 42px;
-        padding: 0 0 74px;
-        overflow: visible;
+        width: min(84vw, 340px);
+        max-height: 60svh;
       }
 
       .work-entry {
-        --scale: clamp(8.9px, 3.55vw, 12.2px);
-        max-width: 88vw;
-      }
-
-      .work-item {
-        box-shadow:
-          0 12px 22px rgba(0, 0, 0, 0.11),
-          0 2px 7px rgba(0, 0, 0, 0.06);
-      }
-
-      .work-caption {
-        margin-top: 9px;
-        font-size: clamp(10px, 3vw, 12px);
-        max-width: min(82vw, 340px);
-      }
-
-      .work-item:hover {
-        transform: none;
-      }
-
-      .work-lightbox {
-        padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
-      }
-
-      .work-lightbox__image {
-        max-width: 92vw;
-        max-height: 76svh;
-        box-shadow:
-          0 18px 38px rgba(0, 0, 0, 0.13),
-          0 4px 12px rgba(0, 0, 0, 0.075);
-      }
-    }
-
-    @media (max-width: 420px) {
-      .image-wrap {
-        width: min(86vw, 350px);
-        max-height: 58svh;
-      }
-
-      .work-entry {
-        --scale: clamp(8.2px, 3.35vw, 10.4px);
+        --scale: 7.6px;
       }
 
       .size-dialogue {
-        --w: 32;
+        --w: 39.8;
       }
     }
   </style>
@@ -602,7 +568,7 @@
       <section id="work" class="view" aria-label="Work">
         <div class="work-grid">
           <div class="work-entry size-frontpage">
-            <div class="work-item">
+            <div class="work-item" tabindex="0" role="button" aria-label="View Mouth Open Wide For Nothing Important larger">
               <img data-img-base="Frontpage_img" alt="Mouth Open Wide For Nothing Important" />
             </div>
             <p class="work-caption">
@@ -612,7 +578,7 @@
           </div>
 
           <div class="work-entry size-24-square">
-            <div class="work-item">
+            <div class="work-item" tabindex="0" role="button" aria-label="View One Time Only larger">
               <img data-img-base="Portfolio1" alt="One Time Only" />
             </div>
             <p class="work-caption">
@@ -622,7 +588,7 @@
           </div>
 
           <div class="work-entry size-12-tall">
-            <div class="work-item tall-crop">
+            <div class="work-item tall-crop" tabindex="0" role="button" aria-label="View Untitled larger">
               <img data-img-base="Portfolio2" alt="Untitled" />
             </div>
             <p class="work-caption">
@@ -632,7 +598,7 @@
           </div>
 
           <div class="work-entry size-12-tall">
-            <div class="work-item tall-crop">
+            <div class="work-item tall-crop" tabindex="0" role="button" aria-label="View Untitled larger">
               <img data-img-base="Portfolio3" alt="Untitled" />
             </div>
             <p class="work-caption">
@@ -642,7 +608,7 @@
           </div>
 
           <div class="work-entry size-dialogue">
-            <div class="work-item">
+            <div class="work-item" tabindex="0" role="button" aria-label="View Dialogue 1 larger">
               <img data-img-base="Portfolio4" alt="Dialogue 1" />
             </div>
             <p class="work-caption dialogue-caption">
@@ -653,7 +619,7 @@
           </div>
 
           <div class="work-entry size-12-square">
-            <div class="work-item">
+            <div class="work-item" tabindex="0" role="button" aria-label="View Untitled larger">
               <img data-img-base="Portfolio5" alt="Untitled" />
             </div>
             <p class="work-caption">
@@ -663,7 +629,7 @@
           </div>
 
           <div class="work-entry size-lying-often">
-            <div class="work-item png-clean">
+            <div class="work-item png-clean" tabindex="0" role="button" aria-label="View Lying Often larger">
               <img data-img-base="Portfolio6" alt="Lying Often" />
             </div>
             <p class="work-caption">
@@ -676,15 +642,11 @@
     </main>
   </div>
 
-
-
-  <div class="work-lightbox" aria-hidden="true">
-    <button class="work-lightbox__close" type="button" aria-label="Close enlarged artwork">Close</button>
-    <div class="work-lightbox__inner">
-      <img class="work-lightbox__image" alt="" />
-      <p class="work-lightbox__caption"></p>
-    </div>
+  <div class="lightbox" aria-hidden="true">
+    <button class="lightbox__close" type="button">Close</button>
+    <img class="lightbox__image" alt="" />
   </div>
+
   <script>
     const links = document.querySelectorAll('[data-view]');
     const views = document.querySelectorAll('.view');
@@ -727,7 +689,7 @@
           return;
         }
 
-        img.src = `./${base}.${imageExtensions[index]}`;
+        img.src = `${base}.${imageExtensions[index]}`;
         index += 1;
       }
 
@@ -735,53 +697,50 @@
       tryNextImage();
     });
 
+    const lightbox = document.querySelector('.lightbox');
+    const lightboxImage = document.querySelector('.lightbox__image');
+    const lightboxClose = document.querySelector('.lightbox__close');
 
-    const workLightbox = document.querySelector('.work-lightbox');
-    const workLightboxImage = document.querySelector('.work-lightbox__image');
-    const workLightboxCaption = document.querySelector('.work-lightbox__caption');
-    const workLightboxClose = document.querySelector('.work-lightbox__close');
-    const workItems = document.querySelectorAll('#work .work-item');
+    function openLightbox(sourceImage) {
+      if (!sourceImage || !sourceImage.currentSrc) return;
 
-    function openWorkLightbox(workItem) {
-      const img = workItem.querySelector('img');
-      const caption = workItem.closest('.work-entry')?.querySelector('.work-caption')?.innerText.trim() || img.alt || '';
-
-      if (!img || !img.currentSrc) return;
-
-      workLightboxImage.src = img.currentSrc;
-      workLightboxImage.alt = img.alt || caption;
-      workLightboxCaption.textContent = caption;
-      workLightbox.classList.add('is-open');
-      workLightbox.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('work-zoom-open');
+      lightboxImage.src = sourceImage.currentSrc;
+      lightboxImage.alt = sourceImage.alt || '';
+      lightbox.classList.add('is-open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lightbox-open');
     }
 
-    function closeWorkLightbox() {
-      workLightbox.classList.remove('is-open');
-      workLightbox.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('work-zoom-open');
+    function closeLightbox() {
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lightbox-open');
     }
 
-    workItems.forEach((workItem) => {
-      workItem.setAttribute('role', 'button');
-      workItem.setAttribute('tabindex', '0');
-      workItem.setAttribute('aria-label', 'Open artwork larger');
+    document.querySelectorAll('#work .work-item').forEach((item) => {
+      item.addEventListener('click', () => {
+        openLightbox(item.querySelector('img'));
+      });
 
-      workItem.addEventListener('click', () => openWorkLightbox(workItem));
-      workItem.addEventListener('keydown', (event) => {
+      item.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          openWorkLightbox(workItem);
+          openLightbox(item.querySelector('img'));
         }
       });
     });
 
-    workLightbox.addEventListener('click', closeWorkLightbox);
-    workLightboxClose.addEventListener('click', closeWorkLightbox);
+    lightbox.addEventListener('click', closeLightbox);
+    lightboxClose.addEventListener('click', closeLightbox);
+
+    lightboxImage.addEventListener('click', (event) => {
+      event.stopPropagation();
+      closeLightbox();
+    });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && workLightbox.classList.contains('is-open')) {
-        closeWorkLightbox();
+      if (event.key === 'Escape' && lightbox.classList.contains('is-open')) {
+        closeLightbox();
       }
     });
   </script>
