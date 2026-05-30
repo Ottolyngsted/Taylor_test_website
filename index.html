@@ -306,6 +306,114 @@
       letter-spacing: -0.02em;
     }
 
+
+
+    body.work-zoom-open {
+      overflow: hidden;
+    }
+
+    body.work-zoom-open::before {
+      background-image: url('./white_wall_big.jpg');
+      background-position: center;
+      background-size: cover;
+    }
+
+    .work-item {
+      cursor: zoom-in;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .work-item:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 19px 38px rgba(0, 0, 0, 0.14),
+        0 5px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .work-item.png-clean:hover {
+      box-shadow: none;
+    }
+
+    .work-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(22px, 5vw, 58px);
+      background: rgba(255, 255, 255, 0.06);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 260ms ease, visibility 0s linear 260ms;
+      cursor: zoom-out;
+    }
+
+    .work-lightbox.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 260ms ease, visibility 0s;
+    }
+
+    .work-lightbox__inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      max-width: min(92vw, 1120px);
+      max-height: min(88svh, 860px);
+      transform: scale(0.965) translateY(8px);
+      opacity: 0;
+      transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 260ms ease;
+    }
+
+    .work-lightbox.is-open .work-lightbox__inner {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    .work-lightbox__image {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: min(92vw, 1120px);
+      max-height: min(82svh, 800px);
+      object-fit: contain;
+      background: #f4f4f4;
+      box-shadow:
+        0 26px 58px rgba(0, 0, 0, 0.14),
+        0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .work-lightbox__caption {
+      max-width: min(82vw, 640px);
+      font-family: "Playwrite GB S Guides", cursive;
+      font-size: clamp(10px, 1.2vw, 13px);
+      line-height: 1.08;
+      letter-spacing: -0.075em;
+      text-align: center;
+      color: rgba(42, 28, 18, 0.68);
+      text-shadow: 0.25px 0.25px 0 rgba(255, 255, 255, 0.42);
+      mix-blend-mode: multiply;
+    }
+
+    .work-lightbox__close {
+      position: absolute;
+      top: max(18px, env(safe-area-inset-top));
+      right: max(18px, env(safe-area-inset-right));
+      border: 0;
+      background: transparent;
+      color: rgba(17, 17, 17, 0.72);
+      font: inherit;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
     @media (max-width: 900px) {
       .work-entry {
         --scale: 10.8px;
@@ -427,6 +535,22 @@
         margin-top: 9px;
         font-size: clamp(10px, 3vw, 12px);
         max-width: min(82vw, 340px);
+      }
+
+      .work-item:hover {
+        transform: none;
+      }
+
+      .work-lightbox {
+        padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      }
+
+      .work-lightbox__image {
+        max-width: 92vw;
+        max-height: 76svh;
+        box-shadow:
+          0 18px 38px rgba(0, 0, 0, 0.13),
+          0 4px 12px rgba(0, 0, 0, 0.075);
       }
     }
 
@@ -552,6 +676,15 @@
     </main>
   </div>
 
+
+
+  <div class="work-lightbox" aria-hidden="true">
+    <button class="work-lightbox__close" type="button" aria-label="Close enlarged artwork">Close</button>
+    <div class="work-lightbox__inner">
+      <img class="work-lightbox__image" alt="" />
+      <p class="work-lightbox__caption"></p>
+    </div>
+  </div>
   <script>
     const links = document.querySelectorAll('[data-view]');
     const views = document.querySelectorAll('.view');
@@ -600,6 +733,56 @@
 
       img.addEventListener('error', tryNextImage);
       tryNextImage();
+    });
+
+
+    const workLightbox = document.querySelector('.work-lightbox');
+    const workLightboxImage = document.querySelector('.work-lightbox__image');
+    const workLightboxCaption = document.querySelector('.work-lightbox__caption');
+    const workLightboxClose = document.querySelector('.work-lightbox__close');
+    const workItems = document.querySelectorAll('#work .work-item');
+
+    function openWorkLightbox(workItem) {
+      const img = workItem.querySelector('img');
+      const caption = workItem.closest('.work-entry')?.querySelector('.work-caption')?.innerText.trim() || img.alt || '';
+
+      if (!img || !img.currentSrc) return;
+
+      workLightboxImage.src = img.currentSrc;
+      workLightboxImage.alt = img.alt || caption;
+      workLightboxCaption.textContent = caption;
+      workLightbox.classList.add('is-open');
+      workLightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('work-zoom-open');
+    }
+
+    function closeWorkLightbox() {
+      workLightbox.classList.remove('is-open');
+      workLightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('work-zoom-open');
+    }
+
+    workItems.forEach((workItem) => {
+      workItem.setAttribute('role', 'button');
+      workItem.setAttribute('tabindex', '0');
+      workItem.setAttribute('aria-label', 'Open artwork larger');
+
+      workItem.addEventListener('click', () => openWorkLightbox(workItem));
+      workItem.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openWorkLightbox(workItem);
+        }
+      });
+    });
+
+    workLightbox.addEventListener('click', closeWorkLightbox);
+    workLightboxClose.addEventListener('click', closeWorkLightbox);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && workLightbox.classList.contains('is-open')) {
+        closeWorkLightbox();
+      }
     });
   </script>
 </body>
