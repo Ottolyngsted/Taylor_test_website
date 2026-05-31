@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,9 +24,14 @@
       --page-top: 28px;
       --page-bottom: 34px;
       --header-space: 128px;
+
       --hand-font: "Playwrite GB S Guides", cursive;
       --serif-font: "Cormorant Garamond", serif;
       --sans-font: "Inter", sans-serif;
+
+      /* Desktop scale: 1 real-life cm = this many screen pixels */
+      --cm-scale: 7.2px;
+      --home-cm-scale: 7.2px;
     }
 
     html {
@@ -156,15 +162,24 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      max-width: 92vw;
     }
 
     .image-wrap {
-      width: min(40.5vw, 446px);
+      width: calc(var(--display-w-cm) * var(--home-cm-scale));
+      max-width: 86vw;
       max-height: 72vh;
-      aspect-ratio: 24 / 29.9;
+      aspect-ratio: var(--display-ratio);
       overflow: hidden;
       background: #f4f4f4;
       box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
+      transition: width 320ms ease, aspect-ratio 320ms ease, box-shadow 220ms ease;
+    }
+
+    .image-wrap.png-clean {
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
     }
 
     .image-wrap img,
@@ -174,6 +189,13 @@
       object-fit: cover;
       display: block;
       filter: none;
+    }
+
+    .image-wrap.png-clean img,
+    .work-item.png-clean img {
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      filter: contrast(1.06);
     }
 
     .frontpage-caption,
@@ -210,7 +232,7 @@
     .frontpage-caption {
       margin-top: 12px;
       font-size: clamp(16.5px, 1.58vw, 25.5px);
-      max-width: min(46vw, 560px);
+      max-width: min(70vw, 760px);
       transform: rotate(-0.4deg);
     }
 
@@ -250,8 +272,7 @@
     }
 
     .work-entry {
-      --scale: 13.2px;
-      width: calc(var(--w) * var(--scale));
+      width: calc(var(--display-w-cm) * var(--cm-scale));
       max-width: 92vw;
       display: flex;
       flex-direction: column;
@@ -260,7 +281,7 @@
 
     .work-item {
       width: 100%;
-      aspect-ratio: var(--ratio);
+      aspect-ratio: var(--display-ratio);
       overflow: hidden;
       background: #f4f4f4;
       box-shadow: 12px 14px 28px rgba(0, 0, 0, 0.13), 3px 4px 9px rgba(0, 0, 0, 0.075);
@@ -289,25 +310,11 @@
       box-shadow: none;
     }
 
-    .work-item.png-clean img {
-      object-fit: contain;
-      mix-blend-mode: multiply;
-      filter: contrast(1.06);
-    }
-
-    .work-item.tall-crop img {
-      object-position: center 58%;
-    }
-
     .work-caption {
       margin-top: 8px;
       font-size: clamp(9px, 0.56vw, 12px);
       max-width: 100%;
       transform: rotate(-0.2deg);
-    }
-
-    .dialogue-caption {
-      margin-top: 0;
     }
 
     .work-title {
@@ -319,13 +326,6 @@
       display: block;
       margin-top: 3px;
     }
-
-    .size-frontpage { --w: 24; --ratio: 24 / 29.9; }
-    .size-24-square { --w: 24; --ratio: 1 / 1; }
-    .size-12-tall { --w: 12; --ratio: 12 / 16.6; }
-    .size-12-square { --w: 12; --ratio: 1 / 1; }
-    .size-lying-often { --w: 18; --ratio: 1 / 1; }
-    .size-dialogue { --w: 39.8; --ratio: 39.8 / 29.9; }
 
     .simple-page {
       align-items: center;
@@ -406,14 +406,19 @@
       overflow: hidden;
     }
 
+    @media (max-width: 1100px) {
+      :root {
+        --cm-scale: 5.7px;
+        --home-cm-scale: 5.7px;
+      }
+    }
+
     @media (max-width: 900px) {
       :root {
         --page-x: 30px;
         --header-space: 118px;
-      }
-
-      .work-entry {
-        --scale: 10.8px;
+        --cm-scale: 4.8px;
+        --home-cm-scale: 4.8px;
       }
 
       .work-grid {
@@ -427,6 +432,8 @@
         --page-top: 22px;
         --page-bottom: max(30px, env(safe-area-inset-bottom));
         --header-space: 142px;
+        --cm-scale: 3.35px;
+        --home-cm-scale: 3.35px;
       }
 
       html,
@@ -477,10 +484,13 @@
       }
 
       .image-wrap {
-        width: min(78vw, 405px);
+        max-width: 86vw;
         max-height: 62svh;
-        min-width: 0;
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.11), 0 3px 8px rgba(0, 0, 0, 0.07);
+      }
+
+      .image-wrap.png-clean {
+        box-shadow: none;
       }
 
       .frontpage-caption {
@@ -516,16 +526,24 @@
       }
 
       .work-entry {
-        --scale: 8.4px;
+        max-width: 88vw;
       }
 
       .work-item {
         box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.07);
       }
 
+      .work-item.png-clean {
+        box-shadow: none;
+      }
+
       .work-item:hover {
         transform: none;
         box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.07);
+      }
+
+      .work-item.png-clean:hover {
+        box-shadow: none;
       }
 
       .work-caption {
@@ -558,6 +576,8 @@
       :root {
         --page-x: 18px;
         --header-space: 136px;
+        --cm-scale: 2.95px;
+        --home-cm-scale: 2.95px;
       }
 
       nav {
@@ -566,20 +586,13 @@
       }
 
       .image-wrap {
-        width: min(84vw, 340px);
+        max-width: 84vw;
         max-height: 58svh;
-      }
-
-      .work-entry {
-        --scale: 7.6px;
-      }
-
-      .size-dialogue {
-        --w: 39.8;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="page">
     <header>
@@ -595,9 +608,9 @@
       <section id="home" class="view active" aria-label="Home">
         <div class="frontpage-work">
           <div class="image-wrap">
-            <img data-img-base="Frontpage_img" alt="Mouth Open Wide For Nothing Important" />
+            <img alt="" />
           </div>
-          <p class="frontpage-caption">MOUTH OPEN WIDE FOR NOTHING IMPORTANT, 2025</p>
+          <p class="frontpage-caption"></p>
         </div>
       </section>
 
@@ -610,78 +623,7 @@
       </section>
 
       <section id="work" class="view" aria-label="Work">
-        <div class="work-grid">
-          <div class="work-entry size-frontpage">
-            <div class="work-item" tabindex="0" role="button" aria-label="View Mouth Open Wide For Nothing Important larger">
-              <img data-img-base="Frontpage_img" alt="Mouth Open Wide For Nothing Important" />
-            </div>
-            <p class="work-caption">
-              <span class="work-title">MOUTH OPEN WIDE FOR NOTHING IMPORTANT, 2025</span>
-              <span class="work-details">29 9/10 × 24 × 4/5 in | 76 × 61 × 2 cm</span>
-            </p>
-          </div>
-
-          <div class="work-entry size-24-square">
-            <div class="work-item" tabindex="0" role="button" aria-label="View One Time Only larger">
-              <img data-img-base="Portfolio1" alt="One Time Only" />
-            </div>
-            <p class="work-caption">
-              <span class="work-title">ONE TIME ONLY, 2025</span>
-              <span class="work-details">24 × 24 × 1 3/5 in | 61 × 61 × 4 cm</span>
-            </p>
-          </div>
-
-          <div class="work-entry size-12-tall">
-            <div class="work-item tall-crop" tabindex="0" role="button" aria-label="View Untitled larger">
-              <img data-img-base="Portfolio2" alt="Untitled" />
-            </div>
-            <p class="work-caption">
-              <span class="work-title">UNTITLED</span>
-              <span class="work-details">12 × 12 × 4/5 in | 30.5 × 30.5 × 2 cm</span>
-            </p>
-          </div>
-
-          <div class="work-entry size-12-tall">
-            <div class="work-item tall-crop" tabindex="0" role="button" aria-label="View Untitled larger">
-              <img data-img-base="Portfolio3" alt="Untitled" />
-            </div>
-            <p class="work-caption">
-              <span class="work-title">UNTITLED</span>
-              <span class="work-details">12 × 12 × 4/5 in | 30.5 × 30.5 × 2 cm</span>
-            </p>
-          </div>
-
-          <div class="work-entry size-dialogue">
-            <div class="work-item" tabindex="0" role="button" aria-label="View Dialogue 1 larger">
-              <img data-img-base="Portfolio4" alt="Dialogue 1" />
-            </div>
-            <p class="work-caption dialogue-caption">
-              <span class="work-title">&nbsp;</span>
-              <span class="work-title">DIALOGUE 1, 2025</span>
-              <span class="work-details">39 4/5 × 29 9/10 × 1 1/5 in | 101 × 76 × 3 cm</span>
-            </p>
-          </div>
-
-          <div class="work-entry size-12-square">
-            <div class="work-item" tabindex="0" role="button" aria-label="View Untitled larger">
-              <img data-img-base="Portfolio5" alt="Untitled" />
-            </div>
-            <p class="work-caption">
-              <span class="work-title">UNTITLED</span>
-              <span class="work-details">12 × 12 × 4/5 in | 30.5 × 30.5 × 2 cm</span>
-            </p>
-          </div>
-
-          <div class="work-entry size-lying-often">
-            <div class="work-item png-clean" tabindex="0" role="button" aria-label="View Lying Often larger">
-              <img data-img-base="Portfolio6" alt="Lying Often" />
-            </div>
-            <p class="work-caption">
-              <span class="work-title">LYING OFTEN, 2025</span>
-              <span class="work-details">12 × 12 × 4/5 in | 30.5 × 30.5 × 2 cm</span>
-            </p>
-          </div>
-        </div>
+        <div class="work-grid" id="workGrid"></div>
       </section>
     </main>
   </div>
@@ -692,6 +634,177 @@
   </div>
 
   <script>
+    const works = [
+      {
+        title: 'BUILDING A FIRE',
+        year: '2025',
+        imageBase: 'building_a_fire',
+        widthCm: 50.8,
+        heightCm: 40.64
+      },
+      {
+        title: 'CLOUD MOVING FASTER THAN THEY DID YESTERDAY',
+        year: '2025',
+        imageBase: 'cloud_moving_faster_than_they_did_yesterday',
+        widthCm: 20.32,
+        heightCm: 20.32
+      },
+      {
+        title: 'MAKING YOU UNDERSTAND EXACTLY',
+        year: '2025',
+        imageBase: 'making_you_understand_exactly',
+        widthCm: 30.48,
+        heightCm: 30.48,
+        displayWidthCm: 45.72,
+        displayHeightCm: 45.72,
+        pngClean: true
+      },
+      {
+        title: 'DIALOGUE 1',
+        year: '2025',
+        imageBase: 'dialogue_1',
+        widthCm: 101.6,
+        heightCm: 72
+      },
+      {
+        title: 'HANDWRITTEN NOTE',
+        year: '2025',
+        imageBase: 'handwritten_note',
+        widthCm: 30.48,
+        heightCm: 30.48
+      },
+      {
+        title: 'LYING OFTEN',
+        year: '2025',
+        imageBase: 'lying_often',
+        widthCm: 30.48,
+        heightCm: 30.48
+      },
+      {
+        title: 'DARIA',
+        year: '2025',
+        imageBase: 'daria',
+        widthCm: 101,
+        heightCm: 101
+      },
+      {
+        title: 'MOUTH OPEN WIDE FOR NOTHING IMPORTANT',
+        year: '2025',
+        imageBase: 'mouth_open_wide_for_nothing_important',
+        widthCm: 76.2,
+        heightCm: 60.96
+      },
+      {
+        title: 'ONE TIME ONLY',
+        year: '2025',
+        imageBase: 'one_time_only',
+        widthCm: 60.96,
+        heightCm: 60.96
+      }
+    ];
+
+    const imageExtensions = ['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'];
+
+    function formatCm(value) {
+      return Number.isInteger(value) ? String(value) : String(value).replace(/\.?0+$/, '');
+    }
+
+    function workLabel(work) {
+      return `${work.title}, ${work.year}`;
+    }
+
+    function workSizeText(work) {
+      return `${formatCm(work.widthCm)} × ${formatCm(work.heightCm)} cm`;
+    }
+
+    function displayWidth(work) {
+      return work.displayWidthCm || work.widthCm;
+    }
+
+    function displayHeight(work) {
+      return work.displayHeightCm || work.heightCm;
+    }
+
+    function applyRealSize(element, work) {
+      element.style.setProperty('--display-w-cm', displayWidth(work));
+      element.style.setProperty('--display-h-cm', displayHeight(work));
+      element.style.setProperty('--display-ratio', `${displayWidth(work)} / ${displayHeight(work)}`);
+    }
+
+    function loadImageBase(img, base) {
+      if (!img || !base) return;
+
+      img.dataset.imgBase = base;
+      let index = 0;
+
+      function tryNextImage() {
+        if (index >= imageExtensions.length) {
+          console.warn(`Could not load image for: ${base}`);
+          img.removeEventListener('error', tryNextImage);
+          return;
+        }
+
+        img.src = `./${base}.${imageExtensions[index]}`;
+        index += 1;
+      }
+
+      if (img._tryNextImage) {
+        img.removeEventListener('error', img._tryNextImage);
+      }
+
+      img._tryNextImage = tryNextImage;
+      img.addEventListener('error', tryNextImage);
+      tryNextImage();
+    }
+
+    function createWorkEntry(work) {
+      const entry = document.createElement('div');
+      entry.className = 'work-entry';
+      applyRealSize(entry, work);
+
+      const item = document.createElement('div');
+      item.className = `work-item${work.pngClean ? ' png-clean' : ''}`;
+      item.tabIndex = 0;
+      item.setAttribute('role', 'button');
+      item.setAttribute('aria-label', `View ${work.title} larger`);
+
+      const img = document.createElement('img');
+      img.alt = work.title;
+      loadImageBase(img, work.imageBase);
+
+      item.appendChild(img);
+
+      const caption = document.createElement('p');
+      caption.className = 'work-caption';
+
+      const title = document.createElement('span');
+      title.className = 'work-title';
+      title.textContent = workLabel(work);
+
+      const details = document.createElement('span');
+      details.className = 'work-details';
+      details.textContent = workSizeText(work);
+
+      caption.appendChild(title);
+      caption.appendChild(details);
+
+      entry.appendChild(item);
+      entry.appendChild(caption);
+
+      item.addEventListener('click', () => {
+        openLightbox(img);
+      });
+
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openLightbox(img);
+        }
+      });
+
+      return entry;
+    }
+
     const links = document.querySelectorAll('[data-view]');
     const views = document.querySelectorAll('.view');
 
@@ -714,91 +827,35 @@
       });
     });
 
-    window.addEventListener('load', () => {
-      const startingView = window.location.hash.replace('#', '') || 'home';
-      if (document.getElementById(startingView)) {
-        showView(startingView);
-      }
+    const workGrid = document.querySelector('#workGrid');
+    works.forEach((work) => {
+      workGrid.appendChild(createWorkEntry(work));
     });
-
-    const imageExtensions = ['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'];
-
-    function loadImageBase(img, base) {
-      if (!img || !base) return;
-
-      img.dataset.imgBase = base;
-      let index = 0;
-
-      function tryNextImage() {
-        if (index >= imageExtensions.length) {
-          console.warn(`Could not load image for: ${base}`);
-          img.removeEventListener('error', tryNextImage);
-          return;
-        }
-
-        img.src = `./${base}.${imageExtensions[index]}`;
-        index += 1;
-      }
-
-      img.removeEventListener('error', img._tryNextImage || (() => {}));
-      img._tryNextImage = tryNextImage;
-      img.addEventListener('error', tryNextImage);
-      tryNextImage();
-    }
-
-    document.querySelectorAll('img[data-img-base]').forEach((img) => {
-      loadImageBase(img, img.dataset.imgBase);
-    });
-
-    const frontpageWorks = [
-      {
-        imageBase: 'Frontpage_img',
-        title: 'MOUTH OPEN WIDE FOR NOTHING IMPORTANT, 2025'
-      },
-      {
-        imageBase: 'Portfolio1',
-        title: 'ONE TIME ONLY, 2025'
-      },
-      {
-        imageBase: 'Portfolio2',
-        title: 'UNTITLED'
-      },
-      {
-        imageBase: 'Portfolio3',
-        title: 'UNTITLED'
-      },
-      {
-        imageBase: 'Portfolio4',
-        title: 'DIALOGUE 1, 2025'
-      },
-      {
-        imageBase: 'Portfolio5',
-        title: 'UNTITLED'
-      },
-      {
-        imageBase: 'Portfolio6',
-        title: 'LYING OFTEN, 2025'
-      }
-    ];
 
     const homeView = document.querySelector('#home');
-    const frontpageImage = document.querySelector('#home img[data-img-base]');
+    const frontpageWrap = document.querySelector('.image-wrap');
+    const frontpageImage = document.querySelector('#home img');
     const frontpageCaption = document.querySelector('.frontpage-caption');
+
     let currentFrontpageIndex = 0;
     let frontpageTimer;
 
     function showFrontpageWork(index) {
-      const work = frontpageWorks[index];
+      const work = works[index];
       if (!work) return;
 
       currentFrontpageIndex = index;
+
+      applyRealSize(frontpageWrap, work);
+      frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
+
       loadImageBase(frontpageImage, work.imageBase);
       frontpageImage.alt = work.title;
-      frontpageCaption.textContent = work.title;
+      frontpageCaption.textContent = workLabel(work);
     }
 
     function nextFrontpageWork() {
-      showFrontpageWork((currentFrontpageIndex + 1) % frontpageWorks.length);
+      showFrontpageWork((currentFrontpageIndex + 1) % works.length);
     }
 
     function restartFrontpageTimer() {
@@ -806,7 +863,7 @@
       frontpageTimer = setInterval(nextFrontpageWork, 8000);
     }
 
-    if (homeView && frontpageImage && frontpageCaption) {
+    if (homeView && frontpageImage && frontpageCaption && frontpageWrap) {
       showFrontpageWork(0);
       restartFrontpageTimer();
 
@@ -816,6 +873,13 @@
         restartFrontpageTimer();
       });
     }
+
+    window.addEventListener('load', () => {
+      const startingView = window.location.hash.replace('#', '') || 'home';
+      if (document.getElementById(startingView)) {
+        showView(startingView);
+      }
+    });
 
     const lightbox = document.querySelector('.lightbox');
     const lightboxImage = document.querySelector('.lightbox__image');
@@ -837,19 +901,6 @@
       document.body.classList.remove('lightbox-open');
     }
 
-    document.querySelectorAll('#work .work-item').forEach((item) => {
-      item.addEventListener('click', () => {
-        openLightbox(item.querySelector('img'));
-      });
-
-      item.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          openLightbox(item.querySelector('img'));
-        }
-      });
-    });
-
     lightbox.addEventListener('click', closeLightbox);
     lightboxClose.addEventListener('click', closeLightbox);
 
@@ -866,3 +917,4 @@
   </script>
 </body>
 </html>
+```
