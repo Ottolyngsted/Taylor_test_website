@@ -167,6 +167,7 @@
       width: calc(var(--display-w-cm) * var(--home-cm-scale));
       max-width: 86vw;
       background: transparent;
+      box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
       transition: width 320ms ease, box-shadow 220ms ease;
     }
 
@@ -761,7 +762,7 @@
       {
         title: 'DARIA',
         year: '2025',
-        src: './daria.JPG',
+        src: './daria.jpg',
         widthCm: 101,
         heightCm: 101,
         displayWidthCm: 101,
@@ -828,7 +829,7 @@
     function cacheSafeSrc(src) {
       if (!src) return '';
       const separator = src.includes('?') ? '&' : '?';
-      return `${src}${separator}v=20260531b`;
+      return `${src}${separator}v=20260531c`;
     }
 
     function loadWorkImage(img, work, eager = false) {
