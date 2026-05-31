@@ -48,6 +48,60 @@
       font-family: var(--sans-font);
     }
 
+    .preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--page-x);
+      background: #ffffff url('./white_wall.jpg') center center / cover fixed no-repeat;
+      transition: opacity 520ms ease, visibility 0s linear 520ms;
+    }
+
+    .preloader__text {
+      font-family: var(--hand-font);
+      font-size: clamp(24px, 3vw, 42px);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.085em;
+      text-align: center;
+      color: rgba(30, 20, 14, 0.62);
+      background:
+        radial-gradient(circle at 12% 26%, rgba(58, 38, 24, 0.26) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 58% 62%, rgba(22, 16, 12, 0.18) 0 0.8px, transparent 1.6px),
+        linear-gradient(
+          115deg,
+          rgba(42, 25, 14, 0.76) 0%,
+          rgba(23, 18, 14, 0.58) 28%,
+          rgba(72, 48, 30, 0.46) 48%,
+          rgba(18, 13, 10, 0.68) 72%,
+          rgba(60, 38, 24, 0.52) 100%
+        );
+      background-size: 13px 11px, 17px 15px, 100% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow:
+        0.35px 0.35px 0 rgba(255, 255, 255, 0.58),
+        -0.35px -0.35px 0 rgba(0, 0, 0, 0.12),
+        0 0 0.7px rgba(32, 20, 12, 0.14);
+      mix-blend-mode: multiply;
+      transform: rotate(-0.4deg);
+    }
+
+    body.is-ready .preloader {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    body.is-loading .page {
+      opacity: 0;
+      pointer-events: none;
+    }
+
     .page {
       min-height: 100vh;
       background: transparent;
@@ -164,11 +218,14 @@
     }
 
     .image-wrap {
+      position: relative;
       width: calc(var(--display-w-cm) * var(--home-cm-scale));
       max-width: 86vw;
+      aspect-ratio: var(--natural-ratio, var(--display-ratio));
       background: transparent;
+      overflow: visible;
       box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
-      transition: width 320ms ease, box-shadow 220ms ease;
+      transition: width 720ms cubic-bezier(.2,.8,.2,1), aspect-ratio 720ms cubic-bezier(.2,.8,.2,1), box-shadow 220ms ease;
     }
 
     .image-wrap.png-clean,
@@ -177,18 +234,47 @@
       box-shadow: none;
     }
 
-    .image-wrap img,
+    .image-wrap img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      opacity: 0;
+      filter: blur(2px);
+      transform: scale(1.035);
+      transition:
+        opacity 900ms ease,
+        filter 900ms ease,
+        transform 1100ms cubic-bezier(.2,.8,.2,1);
+      will-change: opacity, filter, transform;
+    }
+
+    .image-wrap img.is-active {
+      opacity: 1;
+      filter: none;
+      transform: scale(1);
+      z-index: 2;
+    }
+
+    .image-wrap img.is-leaving {
+      opacity: 0;
+      filter: blur(2px);
+      transform: scale(0.982);
+      z-index: 1;
+    }
+
     .work-item img {
       width: 100%;
       height: auto;
       display: block;
       opacity: 0;
-      filter: blur(10px);
-      transform: scale(1.015);
+      filter: blur(8px);
+      transform: scale(1.01);
       transition: opacity 420ms ease, filter 520ms ease, transform 520ms ease;
     }
 
-    .image-wrap img.is-loaded,
     .work-item img.is-loaded {
       opacity: 1;
       filter: none;
@@ -550,6 +636,7 @@
 
       .frontpage-caption,
       .work-caption,
+      .preloader__text,
       .title,
       nav,
       .simple-page {
@@ -659,7 +746,11 @@
   </style>
 </head>
 
-<body>
+<body class="is-loading">
+  <div class="preloader" aria-live="polite" aria-label="Loading artworks">
+    <p class="preloader__text">Loading works</p>
+  </div>
+
   <div class="page">
     <header>
       <a class="title" href="#home" data-view="home">Taylor Tourek</a>
@@ -674,7 +765,8 @@
       <section id="home" class="view active" aria-label="Home">
         <div class="frontpage-work">
           <div class="image-wrap">
-            <img alt="" fetchpriority="high" />
+            <img class="frontpage-image frontpage-image-a" alt="" fetchpriority="high" />
+            <img class="frontpage-image frontpage-image-b" alt="" />
           </div>
           <p class="frontpage-caption"></p>
         </div>
@@ -774,8 +866,10 @@
         src: './mouth_open_wide_for_nothing_important.JPG',
         widthCm: 76.2,
         heightCm: 60.96,
-        displayWidthCm: 76.2,
-        displayHeightCm: 60.96
+        // Display this work 15% smaller than its real-size scale.
+        // Caption and lightbox measurements still show the true dimensions above.
+        displayWidthCm: 64.77,
+        displayHeightCm: 51.816
       },
       {
         title: 'ONE TIME ONLY',
@@ -819,6 +913,50 @@
       element.style.setProperty('--display-w-cm', displayWidth(work));
       element.style.setProperty('--display-h-cm', displayHeight(work));
       element.style.setProperty('--display-ratio', `${displayWidth(work)} / ${displayHeight(work)}`);
+
+      if (work.naturalWidth && work.naturalHeight) {
+        element.style.setProperty('--natural-ratio', `${work.naturalWidth} / ${work.naturalHeight}`);
+      }
+    }
+
+    function cacheSafeSrc(src) {
+      if (!src) return '';
+      const separator = src.includes('?') ? '&' : '?';
+      return `${src}${separator}v=20260531e`;
+    }
+
+    function preloadWork(work) {
+      return new Promise((resolve) => {
+        const image = new Image();
+        image.decoding = 'async';
+        image.onload = () => {
+          work.loadedSrc = image.src;
+          work.naturalWidth = image.naturalWidth;
+          work.naturalHeight = image.naturalHeight;
+          resolve(work);
+        };
+        image.onerror = () => {
+          console.warn(`Could not preload image: ${work.src}`);
+          work.loadedSrc = cacheSafeSrc(work.src);
+          resolve(work);
+        };
+        image.src = cacheSafeSrc(work.src);
+      });
+    }
+
+    function preloadAllWorks() {
+      const preloaderText = document.querySelector('.preloader__text');
+      let loaded = 0;
+
+      return Promise.all(works.map((work) => {
+        return preloadWork(work).then((result) => {
+          loaded += 1;
+          if (preloaderText) {
+            preloaderText.textContent = `Loading works ${loaded}/${works.length}`;
+          }
+          return result;
+        });
+      }));
     }
 
     function markImageLoaded(img) {
@@ -826,25 +964,19 @@
       img.classList.add('is-loaded');
     }
 
-    function cacheSafeSrc(src) {
-      if (!src) return '';
-      const separator = src.includes('?') ? '&' : '?';
-      return `${src}${separator}v=20260531c`;
-    }
-
-    function loadWorkImage(img, work, eager = false) {
+    function loadWorkImage(img, work) {
       if (!img || !work) return;
 
       img.classList.remove('is-loaded');
       img.alt = work.title;
-      img.loading = eager ? 'eager' : 'lazy';
+      img.loading = 'eager';
       img.decoding = 'async';
       img.onload = () => markImageLoaded(img);
       img.onerror = () => {
         console.warn(`Could not load image: ${work.src}`);
         markImageLoaded(img);
       };
-      img.src = cacheSafeSrc(work.src);
+      img.src = work.loadedSrc || cacheSafeSrc(work.src);
 
       if (img.complete && img.naturalWidth > 0) {
         markImageLoaded(img);
@@ -926,30 +1058,50 @@
     });
 
     const workGrid = document.querySelector('#workGrid');
-    works.forEach((work) => {
-      workGrid.appendChild(createWorkEntry(work));
-    });
-
     const homeView = document.querySelector('#home');
     const frontpageWrap = document.querySelector('.image-wrap');
-    const frontpageImage = document.querySelector('#home img');
+    const frontpageImages = Array.from(document.querySelectorAll('.frontpage-image'));
     const frontpageCaption = document.querySelector('.frontpage-caption');
 
     let currentFrontpageIndex = 0;
+    let currentFrontpageLayer = 0;
     let frontpageTimer;
 
-    function showFrontpageWork(index) {
+    function setFrontpageLayer(img, work) {
+      img._work = work;
+      img.alt = work.title;
+      img.src = work.loadedSrc || cacheSafeSrc(work.src);
+    }
+
+    function showFrontpageWork(index, immediate = false) {
       const work = works[index];
-      if (!work) return;
+      if (!work || !frontpageWrap || frontpageImages.length < 2) return;
 
       currentFrontpageIndex = index;
-
       applyRealSize(frontpageWrap, work);
       frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
-
-      frontpageImage._work = work;
-      loadWorkImage(frontpageImage, work, true);
       frontpageCaption.textContent = workLabel(work);
+
+      const nextLayer = immediate ? currentFrontpageLayer : 1 - currentFrontpageLayer;
+      const previousLayer = 1 - nextLayer;
+      const nextImage = frontpageImages[nextLayer];
+      const previousImage = frontpageImages[previousLayer];
+
+      setFrontpageLayer(nextImage, work);
+      nextImage.classList.remove('is-leaving');
+
+      if (immediate) {
+        nextImage.classList.add('is-active');
+        previousImage.classList.remove('is-active', 'is-leaving');
+      } else {
+        requestAnimationFrame(() => {
+          nextImage.classList.add('is-active');
+          previousImage.classList.remove('is-active');
+          previousImage.classList.add('is-leaving');
+        });
+      }
+
+      currentFrontpageLayer = nextLayer;
     }
 
     function nextFrontpageWork() {
@@ -960,24 +1112,6 @@
       clearInterval(frontpageTimer);
       frontpageTimer = setInterval(nextFrontpageWork, 8000);
     }
-
-    if (homeView && frontpageImage && frontpageCaption && frontpageWrap) {
-      showFrontpageWork(0);
-      restartFrontpageTimer();
-
-      homeView.addEventListener('click', (event) => {
-        if (event.target.closest('a')) return;
-        nextFrontpageWork();
-        restartFrontpageTimer();
-      });
-    }
-
-    window.addEventListener('load', () => {
-      const startingView = window.location.hash.replace('#', '') || 'home';
-      if (document.getElementById(startingView)) {
-        showView(startingView);
-      }
-    });
 
     const lightbox = document.querySelector('.lightbox');
     const lightboxImage = document.querySelector('.lightbox__image');
@@ -1016,6 +1150,31 @@
       document.body.classList.remove('lightbox-open');
     }
 
+    function initializeSite() {
+      works.forEach((work) => {
+        workGrid.appendChild(createWorkEntry(work));
+      });
+
+      if (homeView && frontpageCaption && frontpageWrap && frontpageImages.length >= 2) {
+        showFrontpageWork(0, true);
+        restartFrontpageTimer();
+
+        homeView.addEventListener('click', (event) => {
+          if (event.target.closest('a')) return;
+          nextFrontpageWork();
+          restartFrontpageTimer();
+        });
+      }
+
+      const startingView = window.location.hash.replace('#', '') || 'home';
+      if (document.getElementById(startingView)) {
+        showView(startingView);
+      }
+
+      document.body.classList.remove('is-loading');
+      document.body.classList.add('is-ready');
+    }
+
     lightbox.addEventListener('click', closeLightbox);
     lightboxClose.addEventListener('click', closeLightbox);
 
@@ -1032,6 +1191,8 @@
         closeLightbox();
       }
     });
+
+    preloadAllWorks().then(initializeSite);
   </script>
 </body>
 </html>
