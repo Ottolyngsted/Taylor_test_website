@@ -353,21 +353,77 @@
       transition: opacity 320ms ease, visibility 0s;
     }
 
-    .lightbox__image {
-      max-width: min(84vw, 1120px);
-      max-height: 84vh;
-      object-fit: contain;
-      display: block;
-      cursor: zoom-out;
-      box-shadow: 18px 22px 46px rgba(0, 0, 0, 0.16), 5px 7px 14px rgba(0, 0, 0, 0.08);
+    .lightbox__inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(18px, 3vw, 42px);
+      max-width: 94vw;
+      max-height: 86vh;
       transform: scale(0.955) translateY(12px);
       opacity: 0;
       transition: transform 360ms cubic-bezier(.2,.8,.2,1), opacity 300ms ease;
     }
 
-    .lightbox.is-open .lightbox__image {
+    .lightbox.is-open .lightbox__inner {
       transform: scale(1) translateY(0);
       opacity: 1;
+    }
+
+    .lightbox__image {
+      max-width: min(76vw, 1120px);
+      max-height: 84vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      cursor: zoom-out;
+      box-shadow: 18px 22px 46px rgba(0, 0, 0, 0.16), 5px 7px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .lightbox__meta {
+      min-width: 160px;
+      max-width: 250px;
+      font-family: var(--hand-font);
+      font-style: normal;
+      font-weight: 400;
+      line-height: 1.08;
+      letter-spacing: -0.085em;
+      color: rgba(30, 20, 14, 0.62);
+      background:
+        radial-gradient(circle at 12% 26%, rgba(58, 38, 24, 0.26) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 58% 62%, rgba(22, 16, 12, 0.18) 0 0.8px, transparent 1.6px),
+        linear-gradient(
+          115deg,
+          rgba(42, 25, 14, 0.76) 0%,
+          rgba(23, 18, 14, 0.58) 28%,
+          rgba(72, 48, 30, 0.46) 48%,
+          rgba(18, 13, 10, 0.68) 72%,
+          rgba(60, 38, 24, 0.52) 100%
+        );
+      background-size: 13px 11px, 17px 15px, 100% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow:
+        0.35px 0.35px 0 rgba(255, 255, 255, 0.58),
+        -0.35px -0.35px 0 rgba(0, 0, 0, 0.12),
+        0 0 0.7px rgba(32, 20, 12, 0.14);
+      mix-blend-mode: multiply;
+      transform: rotate(-0.35deg);
+    }
+
+    .lightbox__meta-title {
+      display: block;
+      font-size: clamp(16px, 1.5vw, 26px);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .lightbox__meta-size {
+      display: block;
+      font-size: clamp(14px, 1.2vw, 21px);
+      margin-top: 6px;
     }
 
     .lightbox__close {
@@ -553,10 +609,26 @@
         padding: 24px;
       }
 
+      .lightbox__inner {
+        flex-direction: column;
+        gap: 14px;
+        max-height: 86svh;
+      }
+
       .lightbox__image {
         max-width: 88vw;
-        max-height: 76svh;
+        max-height: 68svh;
         box-shadow: 0 16px 32px rgba(0, 0, 0, 0.14), 0 4px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      .lightbox__meta {
+        max-width: 86vw;
+        text-align: center;
+        background: none;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+        -webkit-text-fill-color: currentColor;
+        text-shadow: 0.25px 0.25px 0 rgba(255, 255, 255, 0.52), 0 0 0.45px rgba(32, 20, 12, 0.12);
       }
 
       .lightbox__close {
@@ -623,7 +695,14 @@
 
   <div class="lightbox" aria-hidden="true">
     <button class="lightbox__close" type="button">Close</button>
-    <img class="lightbox__image" alt="" />
+    <div class="lightbox__inner">
+      <img class="lightbox__image" alt="" />
+      <p class="lightbox__meta" aria-live="polite">
+        <span class="lightbox__meta-title"></span>
+        <span class="lightbox__meta-size lightbox__meta-cm"></span>
+        <span class="lightbox__meta-size lightbox__meta-in"></span>
+      </p>
+    </div>
   </div>
 
   <script>
@@ -632,7 +711,6 @@
         title: 'BUILDING A FIRE',
         year: '2025',
         src: './building_a_fire.JPG',
-        base: 'building_a_fire',
         widthCm: 50.8,
         heightCm: 40.64
       },
@@ -640,7 +718,6 @@
         title: 'CLOUD MOVING FASTER THAN THEY DID YESTERDAY',
         year: '2025',
         src: './cloud_moving_faster_than_they_did_yesterday.JPG',
-        base: 'cloud_moving_faster_than_they_did_yesterday',
         widthCm: 20.32,
         heightCm: 20.32
       },
@@ -648,7 +725,6 @@
         title: 'MAKING YOU UNDERSTAND EXACTLY',
         year: '2025',
         src: './making_you_understand_exactly.png',
-        base: 'making_you_understand_exactly',
         widthCm: 30.48,
         heightCm: 30.48,
         displayWidthCm: 45.72,
@@ -659,7 +735,6 @@
         title: 'DIALOGUE 1',
         year: '2025',
         src: './dialogue_1.JPG',
-        base: 'dialogue_1',
         widthCm: 101.6,
         heightCm: 72,
         displayWidthCm: 101.6,
@@ -669,7 +744,6 @@
         title: 'HANDWRITTEN NOTE',
         year: '2025',
         src: './handwritten_note.JPG',
-        base: 'handwritten_note',
         widthCm: 30.48,
         heightCm: 30.48,
         displayWidthCm: 30.48,
@@ -679,7 +753,6 @@
         title: 'LYING OFTEN',
         year: '2025',
         src: './lying_often.JPG',
-        base: 'lying_often',
         widthCm: 30.48,
         heightCm: 30.48,
         displayWidthCm: 30.48,
@@ -689,7 +762,6 @@
         title: 'DARIA',
         year: '2025',
         src: './daria.JPG',
-        base: 'daria',
         widthCm: 101,
         heightCm: 101,
         displayWidthCm: 101,
@@ -699,7 +771,6 @@
         title: 'MOUTH OPEN WIDE FOR NOTHING IMPORTANT',
         year: '2025',
         src: './mouth_open_wide_for_nothing_important.JPG',
-        base: 'mouth_open_wide_for_nothing_important',
         widthCm: 76.2,
         heightCm: 60.96,
         displayWidthCm: 76.2,
@@ -709,7 +780,6 @@
         title: 'ONE TIME ONLY',
         year: '2025',
         src: './one_time_only.JPG',
-        base: 'one_time_only',
         widthCm: 60.96,
         heightCm: 60.96
       }
@@ -723,8 +793,17 @@
       return `${work.title}, ${work.year}`;
     }
 
+    function formatIn(value) {
+      const rounded = Math.round((value / 2.54) * 10) / 10;
+      return Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/\.?0+$/, '');
+    }
+
     function workSizeText(work) {
       return `${formatCm(work.widthCm)} × ${formatCm(work.heightCm)} cm`;
+    }
+
+    function workSizeTextInches(work) {
+      return `${formatIn(work.widthCm)} × ${formatIn(work.heightCm)} in`;
     }
 
     function displayWidth(work) {
@@ -746,50 +825,28 @@
       img.classList.add('is-loaded');
     }
 
-    function imageFallbacks(work) {
-      const paths = new Set();
-      if (work.src) paths.add(work.src);
-      if (work.base) {
-        ['JPG', 'jpg', 'JPEG', 'jpeg', 'PNG', 'png', 'webp', 'WEBP'].forEach((ext) => {
-          paths.add(`./${work.base}.${ext}`);
-        });
-      }
-      return Array.from(paths);
+    function cacheSafeSrc(src) {
+      if (!src) return '';
+      const separator = src.includes('?') ? '&' : '?';
+      return `${src}${separator}v=20260531b`;
     }
 
     function loadWorkImage(img, work, eager = false) {
       if (!img || !work) return;
 
-      const paths = imageFallbacks(work);
-      let index = 0;
-
       img.classList.remove('is-loaded');
       img.alt = work.title;
       img.loading = eager ? 'eager' : 'lazy';
       img.decoding = 'async';
-
-      function finishLoaded() {
+      img.onload = () => markImageLoaded(img);
+      img.onerror = () => {
+        console.warn(`Could not load image: ${work.src}`);
         markImageLoaded(img);
-      }
-
-      function tryNext() {
-        if (index >= paths.length) {
-          console.warn(`Could not load image: ${work.title}`);
-          markImageLoaded(img);
-          return;
-        }
-
-        img.classList.remove('is-loaded');
-        img.src = paths[index];
-        index += 1;
-      }
-
-      img.onload = finishLoaded;
-      img.onerror = tryNext;
-      tryNext();
+      };
+      img.src = cacheSafeSrc(work.src);
 
       if (img.complete && img.naturalWidth > 0) {
-        finishLoaded();
+        markImageLoaded(img);
       }
     }
 
@@ -809,6 +866,7 @@
       item.setAttribute('aria-label', `View ${work.title} larger`);
 
       const img = document.createElement('img');
+      img._work = work;
       loadWorkImage(img, work);
 
       item.appendChild(img);
@@ -831,13 +889,13 @@
       entry.appendChild(caption);
 
       item.addEventListener('click', () => {
-        openLightbox(img);
+        openLightbox(img, work);
       });
 
       item.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          openLightbox(img);
+          openLightbox(img, work);
         }
       });
 
@@ -888,6 +946,7 @@
       applyRealSize(frontpageWrap, work);
       frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
 
+      frontpageImage._work = work;
       loadWorkImage(frontpageImage, work, true);
       frontpageCaption.textContent = workLabel(work);
     }
@@ -922,12 +981,29 @@
     const lightbox = document.querySelector('.lightbox');
     const lightboxImage = document.querySelector('.lightbox__image');
     const lightboxClose = document.querySelector('.lightbox__close');
+    const lightboxInner = document.querySelector('.lightbox__inner');
+    const lightboxMetaTitle = document.querySelector('.lightbox__meta-title');
+    const lightboxMetaCm = document.querySelector('.lightbox__meta-cm');
+    const lightboxMetaIn = document.querySelector('.lightbox__meta-in');
 
-    function openLightbox(sourceImage) {
+    function openLightbox(sourceImage, work) {
       if (!sourceImage || !sourceImage.currentSrc) return;
+
+      const activeWork = work || sourceImage._work;
 
       lightboxImage.src = sourceImage.currentSrc;
       lightboxImage.alt = sourceImage.alt || '';
+
+      if (activeWork) {
+        lightboxMetaTitle.textContent = workLabel(activeWork);
+        lightboxMetaCm.textContent = workSizeText(activeWork);
+        lightboxMetaIn.textContent = workSizeTextInches(activeWork);
+      } else {
+        lightboxMetaTitle.textContent = '';
+        lightboxMetaCm.textContent = '';
+        lightboxMetaIn.textContent = '';
+      }
+
       lightbox.classList.add('is-open');
       lightbox.setAttribute('aria-hidden', 'false');
       document.body.classList.add('lightbox-open');
@@ -942,8 +1018,11 @@
     lightbox.addEventListener('click', closeLightbox);
     lightboxClose.addEventListener('click', closeLightbox);
 
-    lightboxImage.addEventListener('click', (event) => {
+    lightboxInner.addEventListener('click', (event) => {
       event.stopPropagation();
+    });
+
+    lightboxImage.addEventListener('click', () => {
       closeLightbox();
     });
 
