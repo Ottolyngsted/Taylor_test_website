@@ -257,6 +257,47 @@
       transition: none;
     }
 
+    .frontpage-cooldown {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      background:
+        conic-gradient(rgba(30, 20, 14, 0.62) 0turn, rgba(30, 20, 14, 0.62) 1turn),
+        rgba(255, 255, 255, 0.34);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+      mix-blend-mode: multiply;
+    }
+
+    #home.is-cooling {
+      cursor: default;
+    }
+
+    #home.is-cooling .frontpage-cooldown {
+      opacity: 0.72;
+      animation: cooldown-wheel 2000ms linear forwards;
+    }
+
+    @keyframes cooldown-wheel {
+      from {
+        transform: rotate(0deg);
+        background:
+          conic-gradient(rgba(30, 20, 14, 0.62) 0turn, rgba(30, 20, 14, 0.62) 1turn),
+          rgba(255, 255, 255, 0.34);
+      }
+      to {
+        transform: rotate(360deg);
+        background:
+          conic-gradient(rgba(30, 20, 14, 0.62) 0turn, rgba(30, 20, 14, 0.62) 1turn),
+          rgba(255, 255, 255, 0.34);
+      }
+    }
+
     .image-wrap.trim-right {
       overflow: hidden;
     }
@@ -724,6 +765,13 @@
         box-shadow: none;
       }
 
+      .frontpage-cooldown {
+        right: 8px;
+        bottom: 8px;
+        width: 16px;
+        height: 16px;
+      }
+
       .frontpage-caption {
         font-size: clamp(15px, 4.8vw, 22.5px);
         max-width: min(82vw, 420px);
@@ -866,6 +914,7 @@
         <div class="frontpage-work">
           <div class="image-wrap">
             <img class="frontpage-image" alt="" fetchpriority="high" />
+            <span class="frontpage-cooldown" aria-hidden="true"></span>
           </div>
           <p class="frontpage-caption"></p>
         </div>
@@ -1194,8 +1243,11 @@
     const frontpageImage = document.querySelector('.frontpage-image');
     const frontpageCaption = document.querySelector('.frontpage-caption');
 
+    const frontpageCooldownMs = 2000;
     let currentFrontpageIndex = 0;
     let frontpageTimer;
+    let frontpageCooldownTimer;
+    let isFrontpageCooling = false;
 
     function showFrontpageWork(index) {
       const work = works[index];
@@ -1211,6 +1263,30 @@
 
     function nextFrontpageWork() {
       showFrontpageWork((currentFrontpageIndex + 1) % works.length);
+    }
+
+    function startFrontpageCooldown() {
+      if (!homeView) return;
+
+      clearTimeout(frontpageCooldownTimer);
+      isFrontpageCooling = true;
+      homeView.classList.remove('is-cooling');
+
+      // Restart the wheel animation even on repeated manual clicks after the cooldown.
+      void homeView.offsetWidth;
+      homeView.classList.add('is-cooling');
+
+      frontpageCooldownTimer = setTimeout(() => {
+        isFrontpageCooling = false;
+        homeView.classList.remove('is-cooling');
+      }, frontpageCooldownMs);
+    }
+
+    function nextFrontpageWorkManually() {
+      if (isFrontpageCooling) return;
+      nextFrontpageWork();
+      restartFrontpageTimer();
+      startFrontpageCooldown();
     }
 
     function restartFrontpageTimer() {
@@ -1266,8 +1342,7 @@
 
         homeView.addEventListener('click', (event) => {
           if (event.target.closest('a')) return;
-          nextFrontpageWork();
-          restartFrontpageTimer();
+          nextFrontpageWorkManually();
         });
       }
 
