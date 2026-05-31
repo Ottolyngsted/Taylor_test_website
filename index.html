@@ -221,10 +221,12 @@
       position: relative;
       width: calc(var(--display-w-cm) * var(--home-cm-scale));
       max-width: 86vw;
+      aspect-ratio: var(--natural-ratio, var(--display-ratio));
       background: transparent;
       overflow: hidden;
       box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
-      transition: width 420ms ease, box-shadow 220ms ease;
+      transition: width 780ms cubic-bezier(.16, 1, .3, 1), box-shadow 220ms ease;
+      will-change: width;
     }
 
     .image-wrap.png-clean,
@@ -237,16 +239,24 @@
       overflow: visible;
     }
 
-    .image-wrap img {
+    .frontpage-image {
+      position: absolute;
+      inset: 0;
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
+      object-fit: cover;
+      object-position: center center;
       opacity: 0;
-      filter: blur(8px);
-      transition: opacity 520ms ease, filter 620ms ease;
+      filter: blur(3px);
+      transition:
+        opacity 1250ms cubic-bezier(.22, 1, .36, 1),
+        filter 1250ms cubic-bezier(.22, 1, .36, 1);
+      will-change: opacity, filter;
+      pointer-events: none;
     }
 
-    .image-wrap img.is-loaded {
+    .frontpage-image.is-active {
       opacity: 1;
       filter: none;
     }
@@ -255,7 +265,7 @@
       overflow: hidden;
     }
 
-    .image-wrap.trim-right img {
+    .image-wrap.trim-right .frontpage-image {
       width: calc(100% + 2px);
       max-width: none;
       transform: translateX(-1px);
@@ -728,7 +738,100 @@
       .preloader__text,
       .title,
       nav,
-      .simple-page {
+  
+    .contact-page {
+      align-items: center;
+      justify-content: center;
+      padding: var(--header-space) var(--page-x) var(--page-bottom);
+      font-family: var(--hand-font);
+      color: rgba(30, 20, 14, 0.68);
+      mix-blend-mode: multiply;
+    }
+
+    .contact-card {
+      width: min(520px, 86vw);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 18px;
+      transform: rotate(-0.25deg);
+    }
+
+    .contact-heading {
+      font-size: clamp(28px, 3.4vw, 48px);
+      line-height: 1;
+      letter-spacing: -0.085em;
+      text-align: center;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      font-family: var(--sans-font);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .contact-form label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      color: rgba(30, 20, 14, 0.62);
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      border: 1px solid rgba(30, 20, 14, 0.26);
+      background: rgba(255, 255, 255, 0.22);
+      color: #111111;
+      font-family: var(--sans-font);
+      font-size: 14px;
+      line-height: 1.4;
+      padding: 10px 11px;
+      outline: none;
+      resize: vertical;
+      box-shadow: 3px 4px 9px rgba(0, 0, 0, 0.035);
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: rgba(30, 20, 14, 0.48);
+    }
+
+    .contact-form button {
+      align-self: center;
+      margin-top: 4px;
+      border: 0;
+      background: transparent;
+      color: rgba(30, 20, 14, 0.68);
+      font-family: var(--hand-font);
+      font-size: clamp(18px, 1.7vw, 27px);
+      letter-spacing: -0.085em;
+      cursor: pointer;
+      text-shadow: 0.35px 0.35px 0 rgba(255, 255, 255, 0.58), -0.35px -0.35px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: clamp(16px, 1.4vw, 23px);
+      line-height: 1.05;
+      letter-spacing: -0.085em;
+      text-align: center;
+    }
+
+    .contact-links a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+    }
+
+    .simple-page {
         background: none;
         -webkit-background-clip: initial;
         background-clip: initial;
@@ -777,14 +880,102 @@
         max-width: min(78vw, 340px);
       }
 
-      .simple-page,
-      .contact-page {
+  
+    .contact-page {
+      align-items: center;
+      justify-content: center;
+      padding: var(--header-space) var(--page-x) var(--page-bottom);
+      font-family: var(--hand-font);
+      color: rgba(30, 20, 14, 0.68);
+      mix-blend-mode: multiply;
+    }
+
+    .contact-card {
+      width: min(520px, 86vw);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 18px;
+      transform: rotate(-0.25deg);
+    }
+
+    .contact-heading {
+      font-size: clamp(28px, 3.4vw, 48px);
+      line-height: 1;
+      letter-spacing: -0.085em;
+      text-align: center;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      font-family: var(--sans-font);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .contact-form label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      color: rgba(30, 20, 14, 0.62);
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      border: 1px solid rgba(30, 20, 14, 0.26);
+      background: rgba(255, 255, 255, 0.22);
+      color: #111111;
+      font-family: var(--sans-font);
+      font-size: 14px;
+      line-height: 1.4;
+      padding: 10px 11px;
+      outline: none;
+      resize: vertical;
+      box-shadow: 3px 4px 9px rgba(0, 0, 0, 0.035);
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: rgba(30, 20, 14, 0.48);
+    }
+
+    .contact-form button {
+      align-self: center;
+      margin-top: 4px;
+      border: 0;
+      background: transparent;
+      color: rgba(30, 20, 14, 0.68);
+      font-family: var(--hand-font);
+      font-size: clamp(18px, 1.7vw, 27px);
+      letter-spacing: -0.085em;
+      cursor: pointer;
+      text-shadow: 0.35px 0.35px 0 rgba(255, 255, 255, 0.58), -0.35px -0.35px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: clamp(16px, 1.4vw, 23px);
+      line-height: 1.05;
+      letter-spacing: -0.085em;
+      text-align: center;
+    }
+
+    .contact-links a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+    }
+
+    .simple-page {
         min-height: 100svh;
         padding-top: var(--header-space);
-      }
-
-      .contact-card {
-        width: min(88vw, 420px);
       }
 
       .lightbox {
@@ -859,6 +1050,7 @@
       <section id="home" class="view active" aria-label="Home">
         <div class="frontpage-work">
           <div class="image-wrap">
+            <img class="frontpage-image is-active" alt="" fetchpriority="high" />
             <img class="frontpage-image" alt="" fetchpriority="high" />
           </div>
           <p class="frontpage-caption"></p>
@@ -1042,7 +1234,7 @@
     function cacheSafeSrc(src) {
       if (!src) return '';
       const separator = src.includes('?') ? '&' : '?';
-      return `${src}${separator}v=20260531f`;
+      return `${src}${separator}v=20260531g`;
     }
 
     function preloadWork(work) {
@@ -1180,22 +1372,54 @@
     const workGrid = document.querySelector('#workGrid');
     const homeView = document.querySelector('#home');
     const frontpageWrap = document.querySelector('.image-wrap');
-    const frontpageImage = document.querySelector('.frontpage-image');
+    const frontpageImages = Array.from(document.querySelectorAll('.frontpage-image'));
     const frontpageCaption = document.querySelector('.frontpage-caption');
 
     let currentFrontpageIndex = 0;
+    let activeFrontpageLayer = 0;
     let frontpageTimer;
 
-    function showFrontpageWork(index) {
+    function setFrontpageLayer(img, work) {
+      img._work = work;
+      img.alt = work.title;
+      img.loading = 'eager';
+      img.decoding = 'async';
+      img.src = work.loadedSrc || cacheSafeSrc(work.src);
+    }
+
+    function showFrontpageWork(index, immediate = false) {
       const work = works[index];
-      if (!work || !frontpageWrap || !frontpageImage) return;
+      if (!work || !frontpageWrap || frontpageImages.length < 2) return;
 
       currentFrontpageIndex = index;
       applyRealSize(frontpageWrap, work);
       frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
       frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
       frontpageCaption.textContent = workLabel(work);
-      loadWorkImage(frontpageImage, work);
+
+      if (immediate) {
+        activeFrontpageLayer = 0;
+        frontpageImages.forEach((img, layerIndex) => {
+          img.classList.toggle('is-active', layerIndex === activeFrontpageLayer);
+        });
+        setFrontpageLayer(frontpageImages[activeFrontpageLayer], work);
+        return;
+      }
+
+      const nextLayer = activeFrontpageLayer === 0 ? 1 : 0;
+      const nextImage = frontpageImages[nextLayer];
+      const currentImage = frontpageImages[activeFrontpageLayer];
+
+      setFrontpageLayer(nextImage, work);
+      nextImage.classList.remove('is-active');
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          nextImage.classList.add('is-active');
+          currentImage.classList.remove('is-active');
+          activeFrontpageLayer = nextLayer;
+        });
+      });
     }
 
     function nextFrontpageWork() {
@@ -1249,8 +1473,8 @@
         workGrid.appendChild(createWorkEntry(work));
       });
 
-      if (homeView && frontpageCaption && frontpageWrap && frontpageImage) {
-        showFrontpageWork(0);
+      if (homeView && frontpageCaption && frontpageWrap && frontpageImages.length >= 2) {
+        showFrontpageWork(0, true);
         restartFrontpageTimer();
 
         homeView.addEventListener('click', (event) => {
