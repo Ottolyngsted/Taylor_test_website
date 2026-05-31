@@ -220,11 +220,21 @@
     .image-wrap {
       position: relative;
       width: calc(var(--display-w-cm) * var(--home-cm-scale));
+      aspect-ratio: var(--display-ratio);
       max-width: 86vw;
       background: transparent;
       overflow: hidden;
       box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
-      transition: width 420ms ease, box-shadow 220ms ease;
+      transition:
+        width 760ms cubic-bezier(.22,.8,.22,1),
+        aspect-ratio 760ms cubic-bezier(.22,.8,.22,1),
+        box-shadow 220ms ease,
+        transform 760ms cubic-bezier(.22,.8,.22,1);
+      will-change: width, transform;
+    }
+
+    .image-wrap.is-transitioning {
+      transform: translateY(-1px) scale(0.996);
     }
 
     .image-wrap.png-clean,
@@ -239,16 +249,40 @@
 
     .image-wrap img {
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
+      object-fit: contain;
       opacity: 0;
       filter: blur(8px);
-      transition: opacity 520ms ease, filter 620ms ease;
+      transform: scale(1.012);
+      transition:
+        opacity 920ms cubic-bezier(.25,.8,.25,1),
+        filter 980ms ease,
+        transform 980ms cubic-bezier(.22,.8,.22,1);
+      will-change: opacity, filter, transform;
+    }
+
+    .image-wrap img.frontpage-image {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .image-wrap img.frontpage-image.is-active {
+      z-index: 2;
     }
 
     .image-wrap img.is-loaded {
       opacity: 1;
       filter: none;
+      transform: scale(1);
+    }
+
+    .image-wrap img.is-fading-out {
+      opacity: 0;
+      filter: blur(5px);
+      transform: scale(0.992);
     }
 
     .image-wrap.trim-right {
@@ -317,7 +351,16 @@
       margin-top: 12px;
       font-size: clamp(16.5px, 1.58vw, 25.5px);
       max-width: min(70vw, 760px);
-      transform: rotate(-0.4deg);
+      transform: rotate(-0.4deg) translateY(0);
+      opacity: 1;
+      transition:
+        opacity 520ms ease,
+        transform 620ms cubic-bezier(.22,.8,.22,1);
+    }
+
+    .frontpage-caption.is-changing {
+      opacity: 0;
+      transform: rotate(-0.4deg) translateY(5px);
     }
 
     #work {
@@ -859,7 +902,8 @@
       <section id="home" class="view active" aria-label="Home">
         <div class="frontpage-work">
           <div class="image-wrap">
-            <img class="frontpage-image" alt="" fetchpriority="high" />
+            <img class="frontpage-image is-active" alt="" fetchpriority="high" />
+            <img class="frontpage-image" alt="" />
           </div>
           <p class="frontpage-caption"></p>
         </div>
@@ -1042,7 +1086,7 @@
     function cacheSafeSrc(src) {
       if (!src) return '';
       const separator = src.includes('?') ? '&' : '?';
-      return `${src}${separator}v=20260531f`;
+      return `${src}${separator}v=20260531g`;
     }
 
     function preloadWork(work) {
@@ -1180,22 +1224,100 @@
     const workGrid = document.querySelector('#workGrid');
     const homeView = document.querySelector('#home');
     const frontpageWrap = document.querySelector('.image-wrap');
-    const frontpageImage = document.querySelector('.frontpage-image');
+    const frontpageImages = Array.from(document.querySelectorAll('.frontpage-image'));
     const frontpageCaption = document.querySelector('.frontpage-caption');
 
     let currentFrontpageIndex = 0;
+    let activeFrontpageImageIndex = 0;
     let frontpageTimer;
+    let frontpageTransitionId = 0;
 
-    function showFrontpageWork(index) {
+    function setFrontpageCaption(work, immediate = false) {
+      if (!frontpageCaption || !work) return;
+
+      if (immediate) {
+        frontpageCaption.textContent = workLabel(work);
+        frontpageCaption.classList.remove('is-changing');
+        return;
+      }
+
+      frontpageCaption.classList.add('is-changing');
+      window.setTimeout(() => {
+        frontpageCaption.textContent = workLabel(work);
+        frontpageCaption.classList.remove('is-changing');
+      }, 230);
+    }
+
+    function prepareFrontpageImage(img, work) {
+      return new Promise((resolve) => {
+        if (!img || !work) {
+          resolve(false);
+          return;
+        }
+
+        const src = work.loadedSrc || cacheSafeSrc(work.src);
+        img.alt = work.title;
+        img.loading = 'eager';
+        img.decoding = 'async';
+        img.classList.remove('is-loaded', 'is-fading-out', 'is-active');
+
+        const finish = () => {
+          img.onload = null;
+          img.onerror = null;
+          resolve(true);
+        };
+
+        img.onload = finish;
+        img.onerror = () => {
+          console.warn(`Could not load image: ${work.src}`);
+          finish();
+        };
+
+        if (img.getAttribute('src') !== src) {
+          img.src = src;
+        } else if (img.complete) {
+          finish();
+        }
+      });
+    }
+
+    async function showFrontpageWork(index, immediate = false) {
       const work = works[index];
-      if (!work || !frontpageWrap || !frontpageImage) return;
+      if (!work || !frontpageWrap || frontpageImages.length < 2) return;
+
+      const transitionId = ++frontpageTransitionId;
+      const outgoingImage = frontpageImages[activeFrontpageImageIndex];
+      const incomingImageIndex = immediate ? activeFrontpageImageIndex : 1 - activeFrontpageImageIndex;
+      const incomingImage = frontpageImages[incomingImageIndex];
 
       currentFrontpageIndex = index;
       applyRealSize(frontpageWrap, work);
       frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
       frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
-      frontpageCaption.textContent = workLabel(work);
-      loadWorkImage(frontpageImage, work);
+      frontpageWrap.classList.add('is-transitioning');
+
+      setFrontpageCaption(work, immediate);
+      await prepareFrontpageImage(incomingImage, work);
+
+      if (transitionId !== frontpageTransitionId) return;
+
+      requestAnimationFrame(() => {
+        incomingImage.classList.add('is-active');
+        incomingImage.classList.add('is-loaded');
+
+        if (!immediate && outgoingImage && outgoingImage !== incomingImage) {
+          outgoingImage.classList.remove('is-active', 'is-loaded');
+          outgoingImage.classList.add('is-fading-out');
+        }
+
+        activeFrontpageImageIndex = incomingImageIndex;
+        window.setTimeout(() => {
+          if (outgoingImage && outgoingImage !== incomingImage) {
+            outgoingImage.classList.remove('is-fading-out');
+          }
+          frontpageWrap.classList.remove('is-transitioning');
+        }, 980);
+      });
     }
 
     function nextFrontpageWork() {
@@ -1249,8 +1371,8 @@
         workGrid.appendChild(createWorkEntry(work));
       });
 
-      if (homeView && frontpageCaption && frontpageWrap && frontpageImage) {
-        showFrontpageWork(0);
+      if (homeView && frontpageCaption && frontpageWrap && frontpageImages.length >= 2) {
+        showFrontpageWork(0, true);
         restartFrontpageTimer();
 
         homeView.addEventListener('click', (event) => {
