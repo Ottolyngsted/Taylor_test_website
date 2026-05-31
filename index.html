@@ -223,14 +223,8 @@
       max-width: 86vw;
       background: transparent;
       overflow: hidden;
-      box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.25), 3px 4px 9px rgba(0, 0, 0, 0.07);
-      transform-origin: center center;
-      will-change: opacity, transform, width;
-      transition:
-        opacity 260ms ease,
-        width 640ms cubic-bezier(.28,.78,.22,1),
-        box-shadow 220ms ease,
-        transform 520ms cubic-bezier(.28,.78,.22,1);
+      box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
+      transition: box-shadow 220ms ease;
     }
 
     .image-wrap.png-clean,
@@ -243,40 +237,24 @@
       overflow: visible;
     }
 
-    .image-wrap.is-swapping-out {
-      opacity: 0;
-      transform: translateY(0.5px) scale(0.9985);
-      pointer-events: none;
-    }
-
-    .image-wrap.is-swapping-in {
-      opacity: 1;
-      animation: frontpage-settle 520ms cubic-bezier(.22,.8,.22,1) both;
-    }
-
-    @keyframes frontpage-settle {
-      0% {
-        opacity: 0;
-        transform: translateY(-0.5px) scale(1.0018);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
     .image-wrap img {
       width: 100%;
       height: auto;
       display: block;
       opacity: 0;
-      transform: none;
-      transition: opacity 240ms ease;
+      filter: blur(8px);
+      transition: opacity 520ms ease, filter 620ms ease;
     }
 
     .image-wrap img.is-loaded {
       opacity: 1;
-      transform: none;
+      filter: none;
+    }
+
+    .frontpage-image {
+      opacity: 1;
+      filter: none;
+      transition: none;
     }
 
     .image-wrap.trim-right {
@@ -346,12 +324,6 @@
       font-size: clamp(16.5px, 1.58vw, 25.5px);
       max-width: min(70vw, 760px);
       transform: rotate(-0.4deg);
-      transition: opacity 300ms ease, transform 420ms cubic-bezier(.22,.8,.22,1);
-    }
-
-    .frontpage-caption.is-changing {
-      opacity: 0.38;
-      transform: rotate(-0.4deg) translateY(2px);
     }
 
     #work {
@@ -1121,7 +1093,12 @@
     function loadWorkImage(img, work) {
       if (!img || !work) return;
 
-      img.classList.remove('is-loaded');
+      const isFrontpageImage = img.classList.contains('frontpage-image');
+
+      if (!isFrontpageImage) {
+        img.classList.remove('is-loaded');
+      }
+
       img.alt = work.title;
       img.loading = 'eager';
       img.decoding = 'async';
@@ -1132,7 +1109,7 @@
       };
       img.src = work.loadedSrc || cacheSafeSrc(work.src);
 
-      if (img.complete && img.naturalWidth > 0) {
+      if (isFrontpageImage || (img.complete && img.naturalWidth > 0)) {
         markImageLoaded(img);
       }
     }
@@ -1219,99 +1196,17 @@
 
     let currentFrontpageIndex = 0;
     let frontpageTimer;
-    let frontpageTransitionId = 0;
 
-    function setFrontpageCaption(work, immediate = false) {
-      if (!frontpageCaption || !work) return;
-
-      if (immediate) {
-        frontpageCaption.textContent = workLabel(work);
-        frontpageCaption.classList.remove('is-changing');
-        return;
-      }
-
-      frontpageCaption.classList.add('is-changing');
-      window.setTimeout(() => {
-        frontpageCaption.textContent = workLabel(work);
-        frontpageCaption.classList.remove('is-changing');
-      }, 180);
-    }
-
-    function prepareFrontpageWork(work) {
-      return new Promise((resolve) => {
-        if (!work) {
-          resolve(null);
-          return;
-        }
-
-        const src = work.loadedSrc || cacheSafeSrc(work.src);
-        const image = new Image();
-        image.decoding = 'async';
-        image.onload = () => resolve(src);
-        image.onerror = () => {
-          console.warn(`Could not prepare frontpage image: ${work.src}`);
-          resolve(src);
-        };
-        image.src = src;
-      });
-    }
-
-    async function showFrontpageWork(index, immediate = false) {
+    function showFrontpageWork(index) {
       const work = works[index];
       if (!work || !frontpageWrap || !frontpageImage) return;
 
-      const transitionId = ++frontpageTransitionId;
       currentFrontpageIndex = index;
-
-      if (immediate || !frontpageImage.currentSrc) {
-        frontpageWrap.classList.remove('is-swapping-out', 'is-swapping-in');
-        applyRealSize(frontpageWrap, work);
-        frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
-        frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
-        setFrontpageCaption(work, true);
-        loadWorkImage(frontpageImage, work);
-        return;
-      }
-
-      const preparedSrc = await prepareFrontpageWork(work);
-      if (transitionId !== frontpageTransitionId) return;
-
-      // Fade the current artwork away first. The actual src/size swap happens
-      // while the wrapper is invisible, preventing the brief oversized layout flash.
-      frontpageWrap.classList.remove('is-swapping-in');
-      frontpageWrap.classList.add('is-swapping-out');
-      setFrontpageCaption(work);
-
-      window.setTimeout(() => {
-        if (transitionId !== frontpageTransitionId) return;
-
-        applyRealSize(frontpageWrap, work);
-        frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
-        frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
-
-        frontpageImage.classList.remove('is-loaded');
-        frontpageImage.alt = work.title;
-        frontpageImage.loading = 'eager';
-        frontpageImage.decoding = 'async';
-        frontpageImage.src = preparedSrc;
-
-        // Give the browser two frames to apply the new intrinsic dimensions
-        // before the artwork comes back into view.
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            if (transitionId !== frontpageTransitionId) return;
-            frontpageImage.classList.add('is-loaded');
-            frontpageWrap.classList.remove('is-swapping-out');
-            frontpageWrap.classList.add('is-swapping-in');
-          });
-        });
-      }, 280);
-
-      window.setTimeout(() => {
-        if (transitionId === frontpageTransitionId) {
-          frontpageWrap.classList.remove('is-swapping-out', 'is-swapping-in');
-        }
-      }, 980);
+      applyRealSize(frontpageWrap, work);
+      frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
+      frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
+      frontpageCaption.textContent = workLabel(work);
+      loadWorkImage(frontpageImage, work);
     }
 
     function nextFrontpageWork() {
@@ -1366,7 +1261,7 @@
       });
 
       if (homeView && frontpageCaption && frontpageWrap && frontpageImage) {
-        showFrontpageWork(0, true);
+        showFrontpageWork(0);
         restartFrontpageTimer();
 
         homeView.addEventListener('click', (event) => {
