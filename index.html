@@ -258,20 +258,63 @@
     }
 
     .frontpage-cooldown {
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
+      position: relative;
+      display: block;
+      width: 34px;
+      height: 34px;
+      margin: 9px auto 0;
       opacity: 0;
       pointer-events: none;
-      background:
-        conic-gradient(rgba(30, 20, 14, 0.62) 0turn, rgba(30, 20, 14, 0.62) 1turn),
-        rgba(255, 255, 255, 0.34);
-      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
-      mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+      color: rgba(30, 20, 14, 0.62);
       mix-blend-mode: multiply;
+      transform: rotate(-5deg) scale(0.96);
+    }
+
+    .frontpage-cooldown::before {
+      content: "o";
+      position: absolute;
+      inset: -8px 0 0;
+      display: grid;
+      place-items: center;
+      font-family: var(--hand-font);
+      font-size: 39px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.16em;
+      color: rgba(30, 20, 14, 0.62);
+      background:
+        radial-gradient(circle at 12% 26%, rgba(58, 38, 24, 0.26) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 58% 62%, rgba(22, 16, 12, 0.18) 0 0.8px, transparent 1.6px),
+        linear-gradient(
+          115deg,
+          rgba(42, 25, 14, 0.76) 0%,
+          rgba(23, 18, 14, 0.58) 28%,
+          rgba(72, 48, 30, 0.46) 48%,
+          rgba(18, 13, 10, 0.68) 72%,
+          rgba(60, 38, 24, 0.52) 100%
+        );
+      background-size: 13px 11px, 17px 15px, 100% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow:
+        0.35px 0.35px 0 rgba(255, 255, 255, 0.58),
+        -0.35px -0.35px 0 rgba(0, 0, 0, 0.12),
+        0 0 0.7px rgba(32, 20, 12, 0.14);
+    }
+
+    .frontpage-cooldown::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 5px;
+      height: 5px;
+      margin: -2.5px 0 0 -2.5px;
+      border-radius: 50%;
+      background: rgba(30, 20, 14, 0.54);
+      box-shadow: 0 0 0.6px rgba(32, 20, 12, 0.16);
+      transform: translateY(-13px);
     }
 
     #home.is-cooling {
@@ -279,22 +322,16 @@
     }
 
     #home.is-cooling .frontpage-cooldown {
-      opacity: 0.72;
-      animation: cooldown-wheel 2000ms linear forwards;
+      opacity: 0.78;
+      animation: cooldown-hand-wheel 2000ms linear forwards;
     }
 
-    @keyframes cooldown-wheel {
+    @keyframes cooldown-hand-wheel {
       from {
-        transform: rotate(0deg);
-        background:
-          conic-gradient(rgba(30, 20, 14, 0.62) 0turn, rgba(30, 20, 14, 0.62) 1turn),
-          rgba(255, 255, 255, 0.34);
+        transform: rotate(-5deg) scale(0.96);
       }
       to {
-        transform: rotate(360deg);
-        background:
-          conic-gradient(rgba(30, 20, 14, 0.62) 0turn, rgba(30, 20, 14, 0.62) 1turn),
-          rgba(255, 255, 255, 0.34);
+        transform: rotate(355deg) scale(0.96);
       }
     }
 
@@ -766,10 +803,23 @@
       }
 
       .frontpage-cooldown {
-        right: 8px;
-        bottom: 8px;
-        width: 16px;
-        height: 16px;
+        width: 31px;
+        height: 31px;
+        margin-top: 8px;
+      }
+
+      .frontpage-cooldown::before {
+        inset: -7px 0 0;
+        font-size: 36px;
+        background: none;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+        -webkit-text-fill-color: currentColor;
+        text-shadow: 0.25px 0.25px 0 rgba(255, 255, 255, 0.52), 0 0 0.45px rgba(32, 20, 12, 0.12);
+      }
+
+      .frontpage-cooldown::after {
+        transform: translateY(-12px);
       }
 
       .frontpage-caption {
@@ -914,9 +964,9 @@
         <div class="frontpage-work">
           <div class="image-wrap">
             <img class="frontpage-image" alt="" fetchpriority="high" />
-            <span class="frontpage-cooldown" aria-hidden="true"></span>
           </div>
           <p class="frontpage-caption"></p>
+          <span class="frontpage-cooldown" aria-hidden="true"></span>
         </div>
       </section>
 
