@@ -221,11 +221,10 @@
       position: relative;
       width: calc(var(--display-w-cm) * var(--home-cm-scale));
       max-width: 86vw;
-      aspect-ratio: var(--natural-ratio, var(--display-ratio));
       background: transparent;
-      overflow: visible;
+      overflow: hidden;
       box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
-      transition: width 720ms cubic-bezier(.2,.8,.2,1), aspect-ratio 720ms cubic-bezier(.2,.8,.2,1), box-shadow 220ms ease;
+      transition: width 420ms ease, box-shadow 220ms ease;
     }
 
     .image-wrap.png-clean,
@@ -234,35 +233,32 @@
       box-shadow: none;
     }
 
+    .image-wrap.png-clean {
+      overflow: visible;
+    }
+
     .image-wrap img {
-      position: absolute;
-      inset: 0;
       width: 100%;
-      height: 100%;
-      object-fit: contain;
+      height: auto;
       display: block;
       opacity: 0;
-      filter: blur(2px);
-      transform: scale(1.035);
-      transition:
-        opacity 900ms ease,
-        filter 900ms ease,
-        transform 1100ms cubic-bezier(.2,.8,.2,1);
-      will-change: opacity, filter, transform;
+      filter: blur(8px);
+      transition: opacity 520ms ease, filter 620ms ease;
     }
 
-    .image-wrap img.is-active {
+    .image-wrap img.is-loaded {
       opacity: 1;
       filter: none;
-      transform: scale(1);
-      z-index: 2;
     }
 
-    .image-wrap img.is-leaving {
-      opacity: 0;
-      filter: blur(2px);
-      transform: scale(0.982);
-      z-index: 1;
+    .image-wrap.trim-right {
+      overflow: hidden;
+    }
+
+    .image-wrap.trim-right img {
+      width: calc(100% + 2px);
+      max-width: none;
+      transform: translateX(-1px);
     }
 
     .work-item img {
@@ -405,6 +401,99 @@
     .work-details {
       display: block;
       margin-top: 3px;
+    }
+
+
+    .contact-page {
+      align-items: center;
+      justify-content: center;
+      padding: var(--header-space) var(--page-x) var(--page-bottom);
+      font-family: var(--hand-font);
+      color: rgba(30, 20, 14, 0.68);
+      mix-blend-mode: multiply;
+    }
+
+    .contact-card {
+      width: min(520px, 86vw);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 18px;
+      transform: rotate(-0.25deg);
+    }
+
+    .contact-heading {
+      font-size: clamp(28px, 3.4vw, 48px);
+      line-height: 1;
+      letter-spacing: -0.085em;
+      text-align: center;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      font-family: var(--sans-font);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .contact-form label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      color: rgba(30, 20, 14, 0.62);
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      border: 1px solid rgba(30, 20, 14, 0.26);
+      background: rgba(255, 255, 255, 0.22);
+      color: #111111;
+      font-family: var(--sans-font);
+      font-size: 14px;
+      line-height: 1.4;
+      padding: 10px 11px;
+      outline: none;
+      resize: vertical;
+      box-shadow: 3px 4px 9px rgba(0, 0, 0, 0.035);
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: rgba(30, 20, 14, 0.48);
+    }
+
+    .contact-form button {
+      align-self: center;
+      margin-top: 4px;
+      border: 0;
+      background: transparent;
+      color: rgba(30, 20, 14, 0.68);
+      font-family: var(--hand-font);
+      font-size: clamp(18px, 1.7vw, 27px);
+      letter-spacing: -0.085em;
+      cursor: pointer;
+      text-shadow: 0.35px 0.35px 0 rgba(255, 255, 255, 0.58), -0.35px -0.35px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: clamp(16px, 1.4vw, 23px);
+      line-height: 1.05;
+      letter-spacing: -0.085em;
+      text-align: center;
+    }
+
+    .contact-links a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
     }
 
     .simple-page {
@@ -688,9 +777,14 @@
         max-width: min(78vw, 340px);
       }
 
-      .simple-page {
+      .simple-page,
+      .contact-page {
         min-height: 100svh;
         padding-top: var(--header-space);
+      }
+
+      .contact-card {
+        width: min(88vw, 420px);
       }
 
       .lightbox {
@@ -765,15 +859,40 @@
       <section id="home" class="view active" aria-label="Home">
         <div class="frontpage-work">
           <div class="image-wrap">
-            <img class="frontpage-image frontpage-image-a" alt="" fetchpriority="high" />
-            <img class="frontpage-image frontpage-image-b" alt="" />
+            <img class="frontpage-image" alt="" fetchpriority="high" />
           </div>
           <p class="frontpage-caption"></p>
         </div>
       </section>
 
-      <section id="contact" class="view simple-page" aria-label="Contact">
-        <p>Contact</p>
+      <section id="contact" class="view contact-page" aria-label="Contact">
+        <div class="contact-card">
+          <p class="contact-heading">Contact</p>
+
+          <form class="contact-form" action="mailto:tctourek@gmail.com" method="post" enctype="text/plain">
+            <label>
+              <span>Name</span>
+              <input type="text" name="name" autocomplete="name" />
+            </label>
+
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" />
+            </label>
+
+            <label>
+              <span>Message</span>
+              <textarea name="message" rows="5"></textarea>
+            </label>
+
+            <button type="submit">Send</button>
+          </form>
+
+          <p class="contact-links">
+            <a href="mailto:tctourek@gmail.com">tctourek@gmail.com</a>
+            <a href="https://www.instagram.com/tayyylorrrlol/" target="_blank" rel="noopener noreferrer">Instagram</a>
+          </p>
+        </div>
       </section>
 
       <section id="cv" class="view simple-page" aria-label="CV">
@@ -805,7 +924,8 @@
         year: '2025',
         src: './building_a_fire.JPG',
         widthCm: 50.8,
-        heightCm: 40.64
+        heightCm: 40.64,
+        trimRightOnHome: true
       },
       {
         title: 'CLOUD MOVING FASTER THAN THEY DID YESTERDAY',
@@ -922,7 +1042,7 @@
     function cacheSafeSrc(src) {
       if (!src) return '';
       const separator = src.includes('?') ? '&' : '?';
-      return `${src}${separator}v=20260531e`;
+      return `${src}${separator}v=20260531f`;
     }
 
     function preloadWork(work) {
@@ -1060,48 +1180,22 @@
     const workGrid = document.querySelector('#workGrid');
     const homeView = document.querySelector('#home');
     const frontpageWrap = document.querySelector('.image-wrap');
-    const frontpageImages = Array.from(document.querySelectorAll('.frontpage-image'));
+    const frontpageImage = document.querySelector('.frontpage-image');
     const frontpageCaption = document.querySelector('.frontpage-caption');
 
     let currentFrontpageIndex = 0;
-    let currentFrontpageLayer = 0;
     let frontpageTimer;
 
-    function setFrontpageLayer(img, work) {
-      img._work = work;
-      img.alt = work.title;
-      img.src = work.loadedSrc || cacheSafeSrc(work.src);
-    }
-
-    function showFrontpageWork(index, immediate = false) {
+    function showFrontpageWork(index) {
       const work = works[index];
-      if (!work || !frontpageWrap || frontpageImages.length < 2) return;
+      if (!work || !frontpageWrap || !frontpageImage) return;
 
       currentFrontpageIndex = index;
       applyRealSize(frontpageWrap, work);
       frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
+      frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
       frontpageCaption.textContent = workLabel(work);
-
-      const nextLayer = immediate ? currentFrontpageLayer : 1 - currentFrontpageLayer;
-      const previousLayer = 1 - nextLayer;
-      const nextImage = frontpageImages[nextLayer];
-      const previousImage = frontpageImages[previousLayer];
-
-      setFrontpageLayer(nextImage, work);
-      nextImage.classList.remove('is-leaving');
-
-      if (immediate) {
-        nextImage.classList.add('is-active');
-        previousImage.classList.remove('is-active', 'is-leaving');
-      } else {
-        requestAnimationFrame(() => {
-          nextImage.classList.add('is-active');
-          previousImage.classList.remove('is-active');
-          previousImage.classList.add('is-leaving');
-        });
-      }
-
-      currentFrontpageLayer = nextLayer;
+      loadWorkImage(frontpageImage, work);
     }
 
     function nextFrontpageWork() {
@@ -1155,8 +1249,8 @@
         workGrid.appendChild(createWorkEntry(work));
       });
 
-      if (homeView && frontpageCaption && frontpageWrap && frontpageImages.length >= 2) {
-        showFrontpageWork(0, true);
+      if (homeView && frontpageCaption && frontpageWrap && frontpageImage) {
+        showFrontpageWork(0);
         restartFrontpageTimer();
 
         homeView.addEventListener('click', (event) => {
