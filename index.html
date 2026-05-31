@@ -166,27 +166,20 @@
     .image-wrap {
       width: calc(var(--display-w-cm) * var(--home-cm-scale));
       max-width: 86vw;
-      max-height: 72vh;
-      aspect-ratio: var(--display-ratio);
-      overflow: hidden;
-      background: #f4f4f4;
-      box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
-      transition: width 320ms ease, aspect-ratio 320ms ease, box-shadow 220ms ease;
+      background: transparent;
+      transition: width 320ms ease, box-shadow 220ms ease;
     }
 
     .image-wrap.png-clean,
     .work-item.png-clean {
       background: transparent;
       box-shadow: none;
-      overflow: visible;
     }
 
     .image-wrap img,
     .work-item img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center center;
+      height: auto;
       display: block;
       opacity: 0;
       filter: blur(10px);
@@ -199,13 +192,6 @@
       opacity: 1;
       filter: none;
       transform: scale(1);
-    }
-
-    .image-wrap.fit-contain img,
-    .work-item.fit-contain img,
-    .image-wrap.png-clean img,
-    .work-item.png-clean img {
-      object-fit: contain;
     }
 
     .image-wrap.png-clean img,
@@ -296,9 +282,7 @@
 
     .work-item {
       width: 100%;
-      aspect-ratio: var(--display-ratio);
-      overflow: hidden;
-      background: #f4f4f4;
+      background: transparent;
       box-shadow: 12px 14px 28px rgba(0, 0, 0, 0.13), 3px 4px 9px rgba(0, 0, 0, 0.075);
       cursor: zoom-in;
       transition: transform 220ms ease, box-shadow 220ms ease;
@@ -648,6 +632,7 @@
         title: 'BUILDING A FIRE',
         year: '2025',
         src: './building_a_fire.JPG',
+        base: 'building_a_fire',
         widthCm: 50.8,
         heightCm: 40.64
       },
@@ -655,6 +640,7 @@
         title: 'CLOUD MOVING FASTER THAN THEY DID YESTERDAY',
         year: '2025',
         src: './cloud_moving_faster_than_they_did_yesterday.JPG',
+        base: 'cloud_moving_faster_than_they_did_yesterday',
         widthCm: 20.32,
         heightCm: 20.32
       },
@@ -662,67 +648,68 @@
         title: 'MAKING YOU UNDERSTAND EXACTLY',
         year: '2025',
         src: './making_you_understand_exactly.png',
+        base: 'making_you_understand_exactly',
         widthCm: 30.48,
         heightCm: 30.48,
         displayWidthCm: 45.72,
         displayHeightCm: 45.72,
-        pngClean: true,
-        fit: 'contain'
+        pngClean: true
       },
       {
         title: 'DIALOGUE 1',
         year: '2025',
         src: './dialogue_1.JPG',
+        base: 'dialogue_1',
         widthCm: 101.6,
         heightCm: 72,
-        displayWidthCm: 106.6,
-        displayHeightCm: 72,
-        fit: 'contain'
+        displayWidthCm: 101.6,
+        displayHeightCm: 72
       },
       {
         title: 'HANDWRITTEN NOTE',
         year: '2025',
         src: './handwritten_note.JPG',
+        base: 'handwritten_note',
         widthCm: 30.48,
         heightCm: 30.48,
         displayWidthCm: 30.48,
-        displayHeightCm: 35.48,
-        fit: 'contain'
+        displayHeightCm: 30.48
       },
       {
         title: 'LYING OFTEN',
         year: '2025',
         src: './lying_often.JPG',
+        base: 'lying_often',
         widthCm: 30.48,
         heightCm: 30.48,
         displayWidthCm: 30.48,
-        displayHeightCm: 35.48,
-        fit: 'contain'
+        displayHeightCm: 30.48
       },
       {
         title: 'DARIA',
         year: '2025',
         src: './daria.JPG',
+        base: 'daria',
         widthCm: 101,
         heightCm: 101,
-        displayWidthCm: 106,
-        displayHeightCm: 101,
-        fit: 'contain'
+        displayWidthCm: 101,
+        displayHeightCm: 101
       },
       {
         title: 'MOUTH OPEN WIDE FOR NOTHING IMPORTANT',
         year: '2025',
         src: './mouth_open_wide_for_nothing_important.JPG',
+        base: 'mouth_open_wide_for_nothing_important',
         widthCm: 76.2,
         heightCm: 60.96,
         displayWidthCm: 76.2,
-        displayHeightCm: 68.96,
-        fit: 'contain'
+        displayHeightCm: 60.96
       },
       {
         title: 'ONE TIME ONLY',
         year: '2025',
         src: './one_time_only.JPG',
+        base: 'one_time_only',
         widthCm: 60.96,
         heightCm: 60.96
       }
@@ -759,24 +746,50 @@
       img.classList.add('is-loaded');
     }
 
+    function imageFallbacks(work) {
+      const paths = new Set();
+      if (work.src) paths.add(work.src);
+      if (work.base) {
+        ['JPG', 'jpg', 'JPEG', 'jpeg', 'PNG', 'png', 'webp', 'WEBP'].forEach((ext) => {
+          paths.add(`./${work.base}.${ext}`);
+        });
+      }
+      return Array.from(paths);
+    }
+
     function loadWorkImage(img, work, eager = false) {
       if (!img || !work) return;
+
+      const paths = imageFallbacks(work);
+      let index = 0;
 
       img.classList.remove('is-loaded');
       img.alt = work.title;
       img.loading = eager ? 'eager' : 'lazy';
       img.decoding = 'async';
 
-      img.onload = () => markImageLoaded(img);
-      img.onerror = () => {
-        console.warn(`Could not load image: ${work.src}`);
+      function finishLoaded() {
         markImageLoaded(img);
-      };
+      }
 
-      img.src = work.src;
+      function tryNext() {
+        if (index >= paths.length) {
+          console.warn(`Could not load image: ${work.title}`);
+          markImageLoaded(img);
+          return;
+        }
 
-      if (img.complete) {
-        markImageLoaded(img);
+        img.classList.remove('is-loaded');
+        img.src = paths[index];
+        index += 1;
+      }
+
+      img.onload = finishLoaded;
+      img.onerror = tryNext;
+      tryNext();
+
+      if (img.complete && img.naturalWidth > 0) {
+        finishLoaded();
       }
     }
 
@@ -788,8 +801,7 @@
       const item = document.createElement('div');
       item.className = [
         'work-item',
-        work.pngClean ? 'png-clean' : '',
-        work.fit === 'contain' ? 'fit-contain' : ''
+        work.pngClean ? 'png-clean' : ''
       ].filter(Boolean).join(' ');
 
       item.tabIndex = 0;
@@ -875,7 +887,6 @@
 
       applyRealSize(frontpageWrap, work);
       frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
-      frontpageWrap.classList.toggle('fit-contain', work.fit === 'contain');
 
       loadWorkImage(frontpageImage, work, true);
       frontpageCaption.textContent = workLabel(work);
