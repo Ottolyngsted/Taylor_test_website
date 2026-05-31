@@ -220,21 +220,17 @@
     .image-wrap {
       position: relative;
       width: calc(var(--display-w-cm) * var(--home-cm-scale));
-      aspect-ratio: var(--display-ratio);
       max-width: 86vw;
       background: transparent;
       overflow: hidden;
       box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
+      transform-origin: center center;
+      will-change: opacity, transform, width;
       transition:
-        width 760ms cubic-bezier(.22,.8,.22,1),
-        aspect-ratio 760ms cubic-bezier(.22,.8,.22,1),
+        opacity 260ms ease,
+        width 520ms cubic-bezier(.22,.8,.22,1),
         box-shadow 220ms ease,
-        transform 760ms cubic-bezier(.22,.8,.22,1);
-      will-change: width, transform;
-    }
-
-    .image-wrap.is-transitioning {
-      transform: translateY(-1px) scale(0.996);
+        transform 520ms cubic-bezier(.22,.8,.22,1);
     }
 
     .image-wrap.png-clean,
@@ -247,42 +243,40 @@
       overflow: visible;
     }
 
-    .image-wrap img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: contain;
+    .image-wrap.is-swapping-out {
       opacity: 0;
-      filter: blur(8px);
-      transform: scale(1.012);
-      transition:
-        opacity 920ms cubic-bezier(.25,.8,.25,1),
-        filter 980ms ease,
-        transform 980ms cubic-bezier(.22,.8,.22,1);
-      will-change: opacity, filter, transform;
-    }
-
-    .image-wrap img.frontpage-image {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
+      transform: translateY(2px) scale(0.992);
       pointer-events: none;
     }
 
-    .image-wrap img.frontpage-image.is-active {
-      z-index: 2;
+    .image-wrap.is-swapping-in {
+      opacity: 1;
+      animation: frontpage-settle 560ms cubic-bezier(.2,.82,.24,1) both;
+    }
+
+    @keyframes frontpage-settle {
+      0% {
+        opacity: 0;
+        transform: translateY(-1px) scale(1.006);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .image-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      opacity: 0;
+      transform: none;
+      transition: opacity 240ms ease;
     }
 
     .image-wrap img.is-loaded {
       opacity: 1;
-      filter: none;
-      transform: scale(1);
-    }
-
-    .image-wrap img.is-fading-out {
-      opacity: 0;
-      filter: blur(5px);
-      transform: scale(0.992);
+      transform: none;
     }
 
     .image-wrap.trim-right {
@@ -351,16 +345,13 @@
       margin-top: 12px;
       font-size: clamp(16.5px, 1.58vw, 25.5px);
       max-width: min(70vw, 760px);
-      transform: rotate(-0.4deg) translateY(0);
-      opacity: 1;
-      transition:
-        opacity 520ms ease,
-        transform 620ms cubic-bezier(.22,.8,.22,1);
+      transform: rotate(-0.4deg);
+      transition: opacity 300ms ease, transform 420ms cubic-bezier(.22,.8,.22,1);
     }
 
     .frontpage-caption.is-changing {
-      opacity: 0;
-      transform: rotate(-0.4deg) translateY(5px);
+      opacity: 0.38;
+      transform: rotate(-0.4deg) translateY(2px);
     }
 
     #work {
@@ -902,8 +893,7 @@
       <section id="home" class="view active" aria-label="Home">
         <div class="frontpage-work">
           <div class="image-wrap">
-            <img class="frontpage-image is-active" alt="" fetchpriority="high" />
-            <img class="frontpage-image" alt="" />
+            <img class="frontpage-image" alt="" fetchpriority="high" />
           </div>
           <p class="frontpage-caption"></p>
         </div>
@@ -1086,7 +1076,7 @@
     function cacheSafeSrc(src) {
       if (!src) return '';
       const separator = src.includes('?') ? '&' : '?';
-      return `${src}${separator}v=20260531g`;
+      return `${src}${separator}v=20260531f`;
     }
 
     function preloadWork(work) {
@@ -1224,11 +1214,10 @@
     const workGrid = document.querySelector('#workGrid');
     const homeView = document.querySelector('#home');
     const frontpageWrap = document.querySelector('.image-wrap');
-    const frontpageImages = Array.from(document.querySelectorAll('.frontpage-image'));
+    const frontpageImage = document.querySelector('.frontpage-image');
     const frontpageCaption = document.querySelector('.frontpage-caption');
 
     let currentFrontpageIndex = 0;
-    let activeFrontpageImageIndex = 0;
     let frontpageTimer;
     let frontpageTransitionId = 0;
 
@@ -1245,79 +1234,84 @@
       window.setTimeout(() => {
         frontpageCaption.textContent = workLabel(work);
         frontpageCaption.classList.remove('is-changing');
-      }, 230);
+      }, 180);
     }
 
-    function prepareFrontpageImage(img, work) {
+    function prepareFrontpageWork(work) {
       return new Promise((resolve) => {
-        if (!img || !work) {
-          resolve(false);
+        if (!work) {
+          resolve(null);
           return;
         }
 
         const src = work.loadedSrc || cacheSafeSrc(work.src);
-        img.alt = work.title;
-        img.loading = 'eager';
-        img.decoding = 'async';
-        img.classList.remove('is-loaded', 'is-fading-out', 'is-active');
-
-        const finish = () => {
-          img.onload = null;
-          img.onerror = null;
-          resolve(true);
+        const image = new Image();
+        image.decoding = 'async';
+        image.onload = () => resolve(src);
+        image.onerror = () => {
+          console.warn(`Could not prepare frontpage image: ${work.src}`);
+          resolve(src);
         };
-
-        img.onload = finish;
-        img.onerror = () => {
-          console.warn(`Could not load image: ${work.src}`);
-          finish();
-        };
-
-        if (img.getAttribute('src') !== src) {
-          img.src = src;
-        } else if (img.complete) {
-          finish();
-        }
+        image.src = src;
       });
     }
 
     async function showFrontpageWork(index, immediate = false) {
       const work = works[index];
-      if (!work || !frontpageWrap || frontpageImages.length < 2) return;
+      if (!work || !frontpageWrap || !frontpageImage) return;
 
       const transitionId = ++frontpageTransitionId;
-      const outgoingImage = frontpageImages[activeFrontpageImageIndex];
-      const incomingImageIndex = immediate ? activeFrontpageImageIndex : 1 - activeFrontpageImageIndex;
-      const incomingImage = frontpageImages[incomingImageIndex];
-
       currentFrontpageIndex = index;
-      applyRealSize(frontpageWrap, work);
-      frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
-      frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
-      frontpageWrap.classList.add('is-transitioning');
 
-      setFrontpageCaption(work, immediate);
-      await prepareFrontpageImage(incomingImage, work);
+      if (immediate || !frontpageImage.currentSrc) {
+        frontpageWrap.classList.remove('is-swapping-out', 'is-swapping-in');
+        applyRealSize(frontpageWrap, work);
+        frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
+        frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
+        setFrontpageCaption(work, true);
+        loadWorkImage(frontpageImage, work);
+        return;
+      }
 
+      const preparedSrc = await prepareFrontpageWork(work);
       if (transitionId !== frontpageTransitionId) return;
 
-      requestAnimationFrame(() => {
-        incomingImage.classList.add('is-active');
-        incomingImage.classList.add('is-loaded');
+      // Fade the current artwork away first. The actual src/size swap happens
+      // while the wrapper is invisible, preventing the brief oversized layout flash.
+      frontpageWrap.classList.remove('is-swapping-in');
+      frontpageWrap.classList.add('is-swapping-out');
+      setFrontpageCaption(work);
 
-        if (!immediate && outgoingImage && outgoingImage !== incomingImage) {
-          outgoingImage.classList.remove('is-active', 'is-loaded');
-          outgoingImage.classList.add('is-fading-out');
+      window.setTimeout(() => {
+        if (transitionId !== frontpageTransitionId) return;
+
+        applyRealSize(frontpageWrap, work);
+        frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
+        frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
+
+        frontpageImage.classList.remove('is-loaded');
+        frontpageImage.alt = work.title;
+        frontpageImage.loading = 'eager';
+        frontpageImage.decoding = 'async';
+        frontpageImage.src = preparedSrc;
+
+        // Give the browser two frames to apply the new intrinsic dimensions
+        // before the artwork comes back into view.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (transitionId !== frontpageTransitionId) return;
+            frontpageImage.classList.add('is-loaded');
+            frontpageWrap.classList.remove('is-swapping-out');
+            frontpageWrap.classList.add('is-swapping-in');
+          });
+        });
+      }, 280);
+
+      window.setTimeout(() => {
+        if (transitionId === frontpageTransitionId) {
+          frontpageWrap.classList.remove('is-swapping-out', 'is-swapping-in');
         }
-
-        activeFrontpageImageIndex = incomingImageIndex;
-        window.setTimeout(() => {
-          if (outgoingImage && outgoingImage !== incomingImage) {
-            outgoingImage.classList.remove('is-fading-out');
-          }
-          frontpageWrap.classList.remove('is-transitioning');
-        }, 980);
-      });
+      }, 980);
     }
 
     function nextFrontpageWork() {
@@ -1371,7 +1365,7 @@
         workGrid.appendChild(createWorkEntry(work));
       });
 
-      if (homeView && frontpageCaption && frontpageWrap && frontpageImages.length >= 2) {
+      if (homeView && frontpageCaption && frontpageWrap && frontpageImage) {
         showFrontpageWork(0, true);
         restartFrontpageTimer();
 
