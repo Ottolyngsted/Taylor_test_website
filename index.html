@@ -228,9 +228,9 @@
       will-change: opacity, transform, width;
       transition:
         opacity 260ms ease,
-        width 520ms cubic-bezier(.22,.8,.22,1),
+        width 640ms cubic-bezier(.28,.78,.22,1),
         box-shadow 220ms ease,
-        transform 520ms cubic-bezier(.22,.8,.22,1);
+        transform 520ms cubic-bezier(.28,.78,.22,1);
     }
 
     .image-wrap.png-clean,
@@ -245,19 +245,19 @@
 
     .image-wrap.is-swapping-out {
       opacity: 0;
-      transform: translateY(2px) scale(0.992);
+      transform: translateY(0.5px) scale(0.9985);
       pointer-events: none;
     }
 
     .image-wrap.is-swapping-in {
       opacity: 1;
-      animation: frontpage-settle 560ms cubic-bezier(.2,.82,.24,1) both;
+      animation: frontpage-settle 520ms cubic-bezier(.22,.8,.22,1) both;
     }
 
     @keyframes frontpage-settle {
       0% {
         opacity: 0;
-        transform: translateY(-1px) scale(1.006);
+        transform: translateY(-0.5px) scale(1.0018);
       }
       100% {
         opacity: 1;
@@ -1076,7 +1076,7 @@
     function cacheSafeSrc(src) {
       if (!src) return '';
       const separator = src.includes('?') ? '&' : '?';
-      return `${src}${separator}v=20260531f`;
+      return `${src}${separator}v=20260531g`;
     }
 
     function preloadWork(work) {
