@@ -218,15 +218,11 @@
     }
 
     .image-wrap {
-      position: relative;
       width: calc(var(--display-w-cm) * var(--home-cm-scale));
       max-width: 86vw;
-      aspect-ratio: var(--natural-ratio, var(--display-ratio));
       background: transparent;
-      overflow: hidden;
+      overflow: visible;
       box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
-      transition: width 780ms cubic-bezier(.16, 1, .3, 1), box-shadow 220ms ease;
-      will-change: width;
     }
 
     .image-wrap.png-clean,
@@ -235,30 +231,12 @@
       box-shadow: none;
     }
 
-    .image-wrap.png-clean {
-      overflow: visible;
-    }
-
     .frontpage-image {
-      position: absolute;
-      inset: 0;
       width: 100%;
-      height: 100%;
+      height: auto;
       display: block;
-      object-fit: cover;
+      object-fit: initial;
       object-position: center center;
-      opacity: 0;
-      filter: blur(3px);
-      transition:
-        opacity 1250ms cubic-bezier(.22, 1, .36, 1),
-        filter 1250ms cubic-bezier(.22, 1, .36, 1);
-      will-change: opacity, filter;
-      pointer-events: none;
-    }
-
-    .frontpage-image.is-active {
-      opacity: 1;
-      filter: none;
     }
 
     .image-wrap.trim-right {
@@ -1050,7 +1028,6 @@
       <section id="home" class="view active" aria-label="Home">
         <div class="frontpage-work">
           <div class="image-wrap">
-            <img class="frontpage-image is-active" alt="" fetchpriority="high" />
             <img class="frontpage-image" alt="" fetchpriority="high" />
           </div>
           <p class="frontpage-caption"></p>
@@ -1372,54 +1349,28 @@
     const workGrid = document.querySelector('#workGrid');
     const homeView = document.querySelector('#home');
     const frontpageWrap = document.querySelector('.image-wrap');
-    const frontpageImages = Array.from(document.querySelectorAll('.frontpage-image'));
+    const frontpageImage = document.querySelector('.frontpage-image');
     const frontpageCaption = document.querySelector('.frontpage-caption');
 
     let currentFrontpageIndex = 0;
-    let activeFrontpageLayer = 0;
     let frontpageTimer;
 
-    function setFrontpageLayer(img, work) {
-      img._work = work;
-      img.alt = work.title;
-      img.loading = 'eager';
-      img.decoding = 'async';
-      img.src = work.loadedSrc || cacheSafeSrc(work.src);
-    }
-
-    function showFrontpageWork(index, immediate = false) {
+    function showFrontpageWork(index) {
       const work = works[index];
-      if (!work || !frontpageWrap || frontpageImages.length < 2) return;
+      if (!work || !frontpageWrap || !frontpageImage) return;
 
       currentFrontpageIndex = index;
       applyRealSize(frontpageWrap, work);
       frontpageWrap.classList.toggle('png-clean', Boolean(work.pngClean));
       frontpageWrap.classList.toggle('trim-right', Boolean(work.trimRightOnHome));
+
+      frontpageImage._work = work;
+      frontpageImage.alt = work.title;
+      frontpageImage.loading = 'eager';
+      frontpageImage.decoding = 'async';
+      frontpageImage.src = work.loadedSrc || cacheSafeSrc(work.src);
+
       frontpageCaption.textContent = workLabel(work);
-
-      if (immediate) {
-        activeFrontpageLayer = 0;
-        frontpageImages.forEach((img, layerIndex) => {
-          img.classList.toggle('is-active', layerIndex === activeFrontpageLayer);
-        });
-        setFrontpageLayer(frontpageImages[activeFrontpageLayer], work);
-        return;
-      }
-
-      const nextLayer = activeFrontpageLayer === 0 ? 1 : 0;
-      const nextImage = frontpageImages[nextLayer];
-      const currentImage = frontpageImages[activeFrontpageLayer];
-
-      setFrontpageLayer(nextImage, work);
-      nextImage.classList.remove('is-active');
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          nextImage.classList.add('is-active');
-          currentImage.classList.remove('is-active');
-          activeFrontpageLayer = nextLayer;
-        });
-      });
     }
 
     function nextFrontpageWork() {
@@ -1473,8 +1424,8 @@
         workGrid.appendChild(createWorkEntry(work));
       });
 
-      if (homeView && frontpageCaption && frontpageWrap && frontpageImages.length >= 2) {
-        showFrontpageWork(0, true);
+      if (homeView && frontpageCaption && frontpageWrap && frontpageImage) {
+        showFrontpageWork(0);
         restartFrontpageTimer();
 
         homeView.addEventListener('click', (event) => {
