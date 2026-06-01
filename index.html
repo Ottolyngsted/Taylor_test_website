@@ -5,28 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Taylor Tourek</title>
 
+  <!-- Favicon / tab icon -->
+  <link rel="icon" href="./favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="./taylor_tourek_favicon_round.png">
+  <link rel="apple-touch-icon" href="./taylor_tourek_favicon_round.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500;600&display=swap');
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --page-x: 42px;
       --page-top: 28px;
       --page-bottom: 34px;
       --header-space: 128px;
-      --hand-font: "Inter", sans-serif;
       --serif-font: "Cormorant Garamond", serif;
       --sans-font: "Inter", sans-serif;
-
-      /* Controls how large real-life cm appear on screen. */
       --cm-scale: 7.2px;
       --home-cm-scale: 7.2px;
     }
@@ -43,7 +41,7 @@
       min-height: 100vh;
       overflow: hidden;
       background: #ffffff url('./white_wall.jpg') center center / cover fixed no-repeat;
-      color: #111111;
+      color: #111;
       font-family: var(--sans-font);
     }
 
@@ -109,9 +107,7 @@
       mix-blend-mode: multiply;
     }
 
-    header a {
-      pointer-events: auto;
-    }
+    header a { pointer-events: auto; }
 
     .title {
       font-family: var(--serif-font);
@@ -122,9 +118,7 @@
       color: rgba(30, 20, 14, 0.72);
       text-decoration: none;
       cursor: pointer;
-      text-shadow:
-        0.3px 0.3px 0 rgba(255, 255, 255, 0.56),
-        0 0 0.7px rgba(32, 20, 12, 0.16);
+      text-shadow: 0.3px 0.3px 0 rgba(255,255,255,0.56), 0 0 0.7px rgba(32,20,12,0.16);
     }
 
     nav {
@@ -137,9 +131,7 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
       color: rgba(30, 20, 14, 0.68);
-      text-shadow:
-        0.25px 0.25px 0 rgba(255, 255, 255, 0.56),
-        0 0 0.6px rgba(32, 20, 12, 0.14);
+      text-shadow: 0.25px 0.25px 0 rgba(255,255,255,0.56), 0 0 0.6px rgba(32,20,12,0.14);
     }
 
     nav a {
@@ -160,9 +152,7 @@
     }
 
     nav a:hover::after,
-    nav a.active::after {
-      width: 100%;
-    }
+    nav a.active::after { width: 100%; }
 
     main {
       position: relative;
@@ -179,9 +169,7 @@
       background: transparent;
     }
 
-    .view.active {
-      display: flex;
-    }
+    .view.active { display: flex; }
 
     #home {
       align-items: center;
@@ -203,7 +191,7 @@
       max-width: 86vw;
       background: transparent;
       overflow: hidden;
-      box-shadow: 14px 16px 30px rgba(0, 0, 0, 0.115), 3px 4px 9px rgba(0, 0, 0, 0.07);
+      box-shadow: 14px 16px 30px rgba(0,0,0,0.115), 3px 4px 9px rgba(0,0,0,0.07);
       transition: box-shadow 220ms ease;
     }
 
@@ -213,22 +201,23 @@
       box-shadow: none;
     }
 
-    .image-wrap.png-clean {
-      overflow: visible;
-    }
+    .image-wrap.png-clean { overflow: visible; }
 
-    .image-wrap img {
+    .image-wrap img,
+    .work-item img {
       width: 100%;
       height: auto;
       display: block;
       opacity: 0;
       filter: blur(8px);
-      transition: opacity 520ms ease, filter 620ms ease;
+      transition: opacity 520ms ease, filter 620ms ease, transform 520ms ease;
     }
 
-    .image-wrap img.is-loaded {
+    .image-wrap img.is-loaded,
+    .work-item img.is-loaded {
       opacity: 1;
       filter: none;
+      transform: scale(1);
     }
 
     .frontpage-image {
@@ -272,9 +261,7 @@
       transform: translateY(-10px);
     }
 
-    #home.is-cooling {
-      cursor: default;
-    }
+    #home.is-cooling { cursor: default; }
 
     #home.is-cooling .frontpage-cooldown {
       opacity: 0.78;
@@ -282,17 +269,11 @@
     }
 
     @keyframes cooldown-wheel {
-      from {
-        transform: rotate(0deg) scale(0.96);
-      }
-      to {
-        transform: rotate(360deg) scale(0.96);
-      }
+      from { transform: rotate(0deg) scale(0.96); }
+      to { transform: rotate(360deg) scale(0.96); }
     }
 
-    .image-wrap.trim-right {
-      overflow: hidden;
-    }
+    .image-wrap.trim-right { overflow: hidden; }
 
     .image-wrap.trim-right img {
       width: calc(100% + 2px);
@@ -300,30 +281,14 @@
       transform: translateX(-1px);
     }
 
-    .work-item img {
-      width: 100%;
-      height: auto;
-      display: block;
-      opacity: 0;
-      filter: blur(8px);
-      transform: scale(1.01);
-      transition: opacity 420ms ease, filter 520ms ease, transform 520ms ease;
-    }
-
-    .work-item img.is-loaded {
-      opacity: 1;
-      filter: none;
-      transform: scale(1);
-    }
+    .work-item img { transform: scale(1.01); }
 
     .image-wrap.png-clean img,
-    .work-item.png-clean img {
-      mix-blend-mode: multiply;
-    }
+    .work-item.png-clean img { mix-blend-mode: multiply; }
 
     .frontpage-caption,
     .work-caption {
-      font-family: var(--hand-font);
+      font-family: var(--sans-font);
       font-style: normal;
       font-weight: 300;
       line-height: 1.25;
@@ -351,18 +316,9 @@
       padding: 0 var(--page-x) 0;
     }
 
-    #work::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    #work::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    #work::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.14);
-      border-radius: 999px;
-    }
+    #work::-webkit-scrollbar { width: 8px; }
+    #work::-webkit-scrollbar-track { background: transparent; }
+    #work::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.14); border-radius: 999px; }
 
     .work-grid {
       width: min(100%, 1480px);
@@ -387,14 +343,14 @@
     .work-item {
       width: 100%;
       background: transparent;
-      box-shadow: 12px 14px 28px rgba(0, 0, 0, 0.13), 3px 4px 9px rgba(0, 0, 0, 0.075);
+      box-shadow: 12px 14px 28px rgba(0,0,0,0.13), 3px 4px 9px rgba(0,0,0,0.075);
       cursor: zoom-in;
       transition: transform 220ms ease, box-shadow 220ms ease;
     }
 
     .work-item:hover {
       transform: translateY(-2px);
-      box-shadow: 16px 18px 34px rgba(0, 0, 0, 0.14), 4px 5px 10px rgba(0, 0, 0, 0.075);
+      box-shadow: 16px 18px 34px rgba(0,0,0,0.14), 4px 5px 10px rgba(0,0,0,0.075);
     }
 
     .work-item.png-clean:hover {
@@ -403,7 +359,7 @@
     }
 
     .work-item:focus-visible {
-      outline: 1px solid rgba(0, 0, 0, 0.45);
+      outline: 1px solid rgba(0,0,0,0.45);
       outline-offset: 5px;
     }
 
@@ -472,20 +428,18 @@
       width: 100%;
       border: 1px solid rgba(30, 20, 14, 0.26);
       background: rgba(255, 255, 255, 0.22);
-      color: #111111;
+      color: #111;
       font-family: var(--sans-font);
       font-size: 14px;
       line-height: 1.4;
       padding: 10px 11px;
       outline: none;
       resize: vertical;
-      box-shadow: 3px 4px 9px rgba(0, 0, 0, 0.035);
+      box-shadow: 3px 4px 9px rgba(0,0,0,0.035);
     }
 
     .contact-form input:focus,
-    .contact-form textarea:focus {
-      border-color: rgba(30, 20, 14, 0.48);
-    }
+    .contact-form textarea:focus { border-color: rgba(30, 20, 14, 0.48); }
 
     .contact-form button {
       align-self: center;
@@ -520,16 +474,68 @@
       border-bottom: 1px solid currentColor;
     }
 
-    .simple-page {
-      align-items: center;
+    .cv-page {
+      align-items: flex-start;
       justify-content: center;
-      padding: var(--header-space) var(--page-x) var(--page-bottom);
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: calc(var(--header-space) + 46px) var(--page-x) 90px;
       font-family: var(--sans-font);
-      font-size: clamp(18px, 1.8vw, 28px);
+      color: rgba(17, 17, 17, 0.88);
+    }
+
+    .cv-inner {
+      width: min(920px, 100%);
+      font-size: clamp(18px, 1.55vw, 26px);
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+    }
+
+    .cv-header {
+      margin-bottom: 150px;
+    }
+
+    .cv-name {
+      font-weight: 600;
+      letter-spacing: -0.04em;
+    }
+
+    .cv-location {
       font-weight: 300;
-      letter-spacing: 0.02em;
-      color: rgba(30, 20, 14, 0.68);
-      mix-blend-mode: multiply;
+    }
+
+    .cv-section {
+      margin-top: 62px;
+    }
+
+    .cv-section-title {
+      font-size: clamp(18px, 1.45vw, 25px);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      margin-bottom: 32px;
+    }
+
+    .cv-row {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      column-gap: 24px;
+      align-items: start;
+      margin-bottom: 38px;
+    }
+
+    .cv-year {
+      font-weight: 300;
+    }
+
+    .cv-entry {
+      font-weight: 300;
+    }
+
+    .cv-entry strong,
+    .cv-entry em {
+      font-weight: 600;
+      font-style: italic;
     }
 
     .lightbox {
@@ -578,14 +584,13 @@
       object-fit: contain;
       display: block;
       cursor: zoom-out;
-      box-shadow: 18px 22px 46px rgba(0, 0, 0, 0.16), 5px 7px 14px rgba(0, 0, 0, 0.08);
+      box-shadow: 18px 22px 46px rgba(0,0,0,0.16), 5px 7px 14px rgba(0,0,0,0.08);
     }
 
     .lightbox__meta {
       min-width: 160px;
       max-width: 250px;
       font-family: var(--sans-font);
-      font-style: normal;
       font-weight: 300;
       line-height: 1.28;
       letter-spacing: 0.03em;
@@ -624,23 +629,12 @@
       mix-blend-mode: multiply;
     }
 
-    .lightbox.is-open .lightbox__close {
-      opacity: 0.78;
-    }
-
-    .lightbox__close:hover {
-      opacity: 1;
-    }
-
-    body.lightbox-open {
-      overflow: hidden;
-    }
+    .lightbox.is-open .lightbox__close { opacity: 0.78; }
+    .lightbox__close:hover { opacity: 1; }
+    body.lightbox-open { overflow: hidden; }
 
     @media (max-width: 1100px) {
-      :root {
-        --cm-scale: 5.7px;
-        --home-cm-scale: 5.7px;
-      }
+      :root { --cm-scale: 5.7px; --home-cm-scale: 5.7px; }
     }
 
     @media (max-width: 900px) {
@@ -650,10 +644,7 @@
         --cm-scale: 4.8px;
         --home-cm-scale: 4.8px;
       }
-
-      .work-grid {
-        gap: 34px 32px;
-      }
+      .work-grid { gap: 34px 32px; }
     }
 
     @media (max-width: 720px) {
@@ -666,8 +657,7 @@
         --home-cm-scale: 3.35px;
       }
 
-      html,
-      body {
+      html, body {
         background: #ffffff url('./white_wall.jpg') center top / cover scroll no-repeat;
       }
 
@@ -677,18 +667,14 @@
         overflow: auto;
       }
 
-      .page {
-        min-height: 100svh;
-      }
+      .page { min-height: 100svh; }
 
       header {
         flex-direction: column;
         gap: 16px;
       }
 
-      .title {
-        font-size: clamp(34px, 10vw, 50px);
-      }
+      .title { font-size: clamp(34px, 10vw, 50px); }
 
       nav {
         padding-top: 0;
@@ -716,12 +702,10 @@
       .image-wrap {
         max-width: 86vw;
         max-height: 62svh;
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.11), 0 3px 8px rgba(0, 0, 0, 0.07);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.11), 0 3px 8px rgba(0,0,0,0.07);
       }
 
-      .image-wrap.png-clean {
-        box-shadow: none;
-      }
+      .image-wrap.png-clean { box-shadow: none; }
 
       .frontpage-cooldown {
         width: 27px;
@@ -749,45 +733,52 @@
         overflow: visible;
       }
 
-      .work-entry {
-        max-width: 88vw;
-      }
+      .work-entry { max-width: 88vw; }
 
       .work-item {
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.07);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.07);
       }
 
-      .work-item.png-clean {
-        box-shadow: none;
-      }
+      .work-item.png-clean { box-shadow: none; }
 
       .work-item:hover {
         transform: none;
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.07);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.07);
       }
 
-      .work-item.png-clean:hover {
-        box-shadow: none;
-      }
+      .work-item.png-clean:hover { box-shadow: none; }
 
       .work-caption {
         font-size: clamp(9px, 2.4vw, 11px);
         max-width: min(78vw, 340px);
       }
 
-      .simple-page,
-      .contact-page {
+      .contact-page,
+      .cv-page {
         min-height: 100svh;
-        padding-top: var(--header-space);
+        padding-top: calc(var(--header-space) + 26px);
       }
 
-      .contact-card {
-        width: min(88vw, 420px);
+      .contact-card { width: min(88vw, 420px); }
+
+      .cv-inner {
+        font-size: clamp(18px, 5.1vw, 24px);
       }
 
-      .lightbox {
-        padding: 24px;
+      .cv-header {
+        margin-bottom: 96px;
       }
+
+      .cv-section {
+        margin-top: 52px;
+      }
+
+      .cv-row {
+        grid-template-columns: 62px 1fr;
+        column-gap: 18px;
+      }
+
+      .lightbox { padding: 24px; }
 
       .lightbox__inner {
         flex-direction: column;
@@ -798,7 +789,7 @@
       .lightbox__image {
         max-width: 88vw;
         max-height: 68svh;
-        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.14), 0 4px 10px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 16px 32px rgba(0,0,0,0.14), 0 4px 10px rgba(0,0,0,0.08);
       }
 
       .lightbox__meta {
@@ -889,8 +880,29 @@
         </div>
       </section>
 
-      <section id="cv" class="view simple-page" aria-label="CV">
-        <p>CV</p>
+      <section id="cv" class="view cv-page" aria-label="CV">
+        <div class="cv-inner">
+          <div class="cv-header">
+            <p class="cv-name">Taylor Tourek</p>
+            <p class="cv-location">based in Los Angeles, CA</p>
+          </div>
+
+          <section class="cv-section" aria-label="Education">
+            <h2 class="cv-section-title">Education</h2>
+            <div class="cv-row">
+              <p class="cv-year">2018</p>
+              <p class="cv-entry"><strong>BFA Fine Art</strong>, Art Center College of Design (Pasadena, CA)</p>
+            </div>
+          </section>
+
+          <section class="cv-section" aria-label="Selected exhibitions">
+            <h2 class="cv-section-title">Selected exhibitions</h2>
+            <div class="cv-row">
+              <p class="cv-year">2026</p>
+              <p class="cv-entry"><strong>Rationale</strong> group exhibition<br>Galleri Zeuthen, Copenhagen, Denmark</p>
+            </div>
+          </section>
+        </div>
       </section>
 
       <section id="work" class="view" aria-label="Work">
@@ -980,8 +992,6 @@
         src: './mouth_open_wide_for_nothing_important.JPG',
         widthCm: 76.2,
         heightCm: 60.96,
-        // Display this work 15% smaller than its real-size scale.
-        // Caption and lightbox measurements still show the true dimensions above.
         displayWidthCm: 64.77,
         displayHeightCm: 51.816
       },
@@ -1036,7 +1046,7 @@
     function cacheSafeSrc(src) {
       if (!src) return '';
       const separator = src.includes('?') ? '&' : '?';
-      return `${src}${separator}v=20260531g`;
+      return `${src}${separator}v=20260601a`;
     }
 
     function preloadWork(work) {
@@ -1108,11 +1118,7 @@
       applyRealSize(entry, work);
 
       const item = document.createElement('div');
-      item.className = [
-        'work-item',
-        work.pngClean ? 'png-clean' : ''
-      ].filter(Boolean).join(' ');
-
+      item.className = ['work-item', work.pngClean ? 'png-clean' : ''].filter(Boolean).join(' ');
       item.tabIndex = 0;
       item.setAttribute('role', 'button');
       item.setAttribute('aria-label', `View ${work.title} larger`);
@@ -1140,9 +1146,7 @@
       entry.appendChild(item);
       entry.appendChild(caption);
 
-      item.addEventListener('click', () => {
-        openLightbox(img, work);
-      });
+      item.addEventListener('click', () => openLightbox(img, work));
 
       item.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -1211,7 +1215,6 @@
       isFrontpageCooling = true;
       homeView.classList.remove('is-cooling');
 
-      // Restart the wheel animation even on repeated manual clicks after the cooldown.
       void homeView.offsetWidth;
       homeView.classList.add('is-cooling');
 
@@ -1301,9 +1304,7 @@
       event.stopPropagation();
     });
 
-    lightboxImage.addEventListener('click', () => {
-      closeLightbox();
-    });
+    lightboxImage.addEventListener('click', closeLightbox);
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && lightbox.classList.contains('is-open')) {
